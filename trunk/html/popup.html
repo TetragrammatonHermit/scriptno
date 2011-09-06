@@ -269,7 +269,7 @@
 								$(".pclear").bind("click", removehandle);
 							}
 						}
-						if (response.status == 'true') $("#footer").prepend('<span class="box box2 snstatus" title="Disable ScriptNo">Disable ScriptNo</span>&nbsp;|&nbsp;');
+						if (response.status == 'true') $("#footer").prepend('<span class="box box2 snstatus" title="Disable ScriptNo">Disable</span>&nbsp;|&nbsp;');
 						$(".snstatus").bind("click", statuschange);
 						closepage = response.closepage;
 					});
@@ -470,7 +470,7 @@
 			<tr><th>Resources (hover each to see paths)</td><th id="currentdomain"></th></tr>
 			<tr><td class="thirds"></td><td id="parent"></td></tr>
 		</table>
-		<div id="credit">Andrew Y. | <a href="javascript:;" onclick="openTab('http://andryou.com/2011/08/21/scriptno-a-quick-guide/'); return false;">Quick Start</a> | <a href="javascript:;" onclick="openTab('http://andryou.com/2011/08/14/scriptno/'); return false;">Overview</a></div>
+		<div id="credit">Andrew Y. | <a href="javascript:;" onclick="openTab('http://andryou.com/2011/08/21/scriptno-a-quick-guide/'); return false;">Quick Start</a> | <a href="javascript:;" onclick="openTab('http://andryou.com/2011/08/14/scriptno/'); return false;">Overview</a> | <a href="javascript:;" onclick="openTab('http://code.google.com/p/scriptno/'); return false;">Project</a></div>
 		<div id="footer"><a href="javascript:;" onclick="openTab(chrome.extension.getURL('html/options.html')); return false;">Options</a> | <a href="javascript:;" onclick="openTab('https://chrome.google.com/webstore/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf'); return false;">ScriptNo v<span id="version"></span></a></div>
 	</div>
 </body>
