@@ -20,15 +20,15 @@ You can also choose to set “Default Mode” to “Allow“, but this is not re
 
 == 4. Does ScriptNo provide a database of things to block? ==
 
-Yes, it does! In fact, there are two "databases" or lists:
-  # Blacklist (user-configurable)
-  # "Block Unwanted Content" list (not user-configurable)
+Yes, it does! In fact, there are two "databases" or lists (both optional):
+  # Blacklist (user-configurable) - empty by default
+  # "Block Unwanted Content" list (not user-configurable) - contains domains that provide unwanted content
   
 For the Blacklist, you can directly modify it in the Options page. Whenever you "Deny" a domain, the domain is added to the Blacklist. This means that over time, ScriptNo ensures what you want blocked is blocked.
 
-To use the latter list, you need to ensure "Block Unwanted Content" is ticked.
+To use the latter list, ensure "Block Unwanted Content" is ticked.
 
-This approach (two lists) gives you flexibility and choice.
+This approach (two lists) gives you flexibility, security and choice.
 
 == I love this extension! How do I convey this love to you? ==
 
