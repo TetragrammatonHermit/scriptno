@@ -78,7 +78,7 @@ function domainCheck(domain, req) {
 		if ((SETTINGS['ANNOYANCES'] == 'true' && SETTINGS['ANNOYANCESMODE'] == 'strict' && baddies(domain, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '1') || (SETTINGS['ANTISOCIAL'] == 'true' && baddies(domain, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '2')) return '1';
 	}
 	domainname = extractDomainFromURL(relativeToAbsoluteUrl(domain.toLowerCase()));
-	if ((domainname.indexOf(".") == -1 && domain.indexOf(".") != -1) || domain.indexOf(".") == -1) domainname = domain;
+	if (domainname.indexOf(".") == -1 && domain.indexOf(".") != -1) domainname = domain.toLowerCase();
 	if (domainname.substr(0,4) == 'www.') {
 		if (SETTINGS['MODE'] == 'block' && in_array(domainname.substr(4), SETTINGS['WHITELISTSESSION'])) return '0';
 		if (SETTINGS['MODE'] == 'allow' && in_array(domainname.substr(4), SETTINGS['BLACKLISTSESSION'])) return '1';

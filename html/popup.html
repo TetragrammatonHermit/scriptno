@@ -74,7 +74,8 @@
 							$(".thirds").html('<i>This tab has loaded no external resources</i>');
 						} else {
 							if (response.blockeditems.length > 0) {
-								response.blockeditems.sort();
+								if (response.domainsort == 'true') response.blockeditems = bkg.domainSort(response.blockeditems);
+								else response.blockeditems.sort();
 								$(".thirds").parent().after("<tr><td class='bolded' style='padding-top: 5px;'><span class='blocked'>Blocked Resources</span></td><td id='parent'></td></tr><tr><td class='thirds'></td><td></td></tr>");
 								$(".thirds:first").parent().remove();
 								$("#parent").attr("rowspan","2");
@@ -86,7 +87,7 @@
 										blocked.push([itemdomain, bkg.domainCheck(itemdomain)]);
 										if ($('.thirds .thirditem[rel="x_'+itemdomain+'"]').length == 0) {
 											if (bkg.domainCheck(itemdomain, 1) == '1') {
-												$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+response.blockeditems[i][0]+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist selected" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist selected" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												if (mode == 'allow' && bkg.in_array(itemdomain, JSON.parse(response.temp)) || (itemdomain.substr(0,4) == 'www.' && bkg.in_array(itemdomain.substr(4), JSON.parse(response.temp)))) {
 													//
 												} else {
@@ -95,9 +96,9 @@
 												}
 											} else {
 												if (response.blockeditems[i][1] == 'NOSCRIPT' || response.blockeditems[i][1] == 'WEBBUG') {
-													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>&lt;'+response.blockeditems[i][1]+'&gt;</span> (<span rel="count_'+itemdomain+'">1</span>)</span></div>');
+													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>&lt;'+response.blockeditems[i][1]+'&gt;</span> (<span rel="count_'+itemdomain+'">1</span>)</span></div>');
 												} else {
-													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+response.blockeditems[i][0]+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												}
 											}
 										} else {
@@ -137,7 +138,8 @@
 								}
 							}
 							if (response.alloweditems.length > 0) {
-								response.alloweditems.sort();
+								if (response.domainsort == 'true') response.alloweditems = bkg.domainSort(response.alloweditems);
+								else response.alloweditems.sort();
 								$("#parent").attr("rowspan","3");
 								$(".thirds").parent().parent().append("<tr><td class='bolded' style='padding-top: 15px;'><span class='allowed'>Allowed Resources</span></td><td class='bolded'></td></tr><tr><td class='thirds' id='allowed'></td><td></td></tr>");
 								if (blocked.length > 0) $("#parent").attr("rowspan","4");
@@ -154,7 +156,7 @@
 													allowedtype = 3;
 												}
 												else allowedtype = 0;
-												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+response.alloweditems[i][0]+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist selected" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist selected" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												if (mode == 'block' && bkg.in_array(itemdomain, JSON.parse(response.temp)) || (itemdomain.substr(0,4) == 'www.' && bkg.in_array(itemdomain.substr(4), JSON.parse(response.temp)))) {
 													//
 												} else {
@@ -162,7 +164,7 @@
 													$(".x_"+itemdomain.replace(/\./g,"_")).bind("click", x_removehandle);
 												}
 											} else {
-												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+response.alloweditems[i][0]+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 											}
 										} else {
 											$("#allowed [rel='x_"+itemdomain+"']").attr("title",$("#allowed [rel='x_"+itemdomain+"']").attr("title")+"\r\n["+response.alloweditems[i][1]+"] "+response.alloweditems[i][0]);

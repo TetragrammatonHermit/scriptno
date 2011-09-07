@@ -60,7 +60,8 @@ function domainCheck(domain, req) {
 		if ((localStorage['annoyances'] == 'true' && localStorage['annoyancesmode'] == 'strict' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) return '1';
 	}
 	domainname = extractDomainFromURL(domain.toLowerCase());
-	if ((domainname.indexOf(".") == -1 && domain.indexOf(".") != -1) || domain.indexOf(".") == -1) domainname = domain;
+	if (domainname.indexOf(".") == -1 && domain.indexOf(".") != -1) domainname = domain.toLowerCase();
+	console.log(domainname);
 	var blackList = JSON.parse(localStorage['blackList']);
 	var whiteList = JSON.parse(localStorage['whiteList']);
 	var blackListSession = JSON.parse(sessionStorage['blackList']);
@@ -80,6 +81,34 @@ function domainCheck(domain, req) {
 		if (localStorage['annoyances'] == 'true' && localStorage['annoyancesmode'] == 'relaxed' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') return '1';
 	}
 	return '-1';
+}
+function domainSort(hosts) {
+	sorted_hosts = new Array();
+	split_hosts = new Array();
+	multi = false;
+	if (hosts.length > 0) {
+		if (hosts[0].length == 2) multi = true;
+		if (multi) {
+			nodeinfo = new Array();
+			for (h in hosts) {
+				split_hosts.push([getDomain(extractDomainFromURL(hosts[h][0])), hosts[h][0], hosts[h][1]]);
+			}
+			split_hosts.sort();
+			for (h in split_hosts) {
+				sorted_hosts.push([split_hosts[h][1], split_hosts[h][2]]);
+			}
+		} else {
+			for (h in hosts) {
+				split_hosts.push([getDomain(extractDomainFromURL(hosts[h])), hosts[h]]);
+			}
+			split_hosts.sort();
+			for (h in split_hosts) {
+				sorted_hosts.push(split_hosts[h][1]);
+			}
+		}
+		return sorted_hosts;
+	}
+	return hosts;
 }
 function trustCheck(domain) {
 	var blackList = JSON.parse(localStorage['blackList']);
@@ -194,6 +223,7 @@ function setDefaultOptions() {
 	defaultOptionValue("referrer", "true");
 	defaultOptionValue("linktarget", "off");
 	defaultOptionValue("search", "duckduckgo");
+	defaultOptionValue("domainsort", "true");
 	if (!optionExists("blackList")) localStorage['blackList'] = JSON.stringify([]);
 	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);
@@ -296,7 +326,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		if (trustCheck(extractDomainFromURL(request.url))) enableval = 3;
 		if (localStorage['mode'] == 'block') sessionlist = sessionStorage['whiteList'];
 		else if (localStorage['mode'] == 'allow') sessionlist = sessionStorage['blackList'];
-		sendResponse({status: localStorage['enable'], enable: enableval, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], annoyances: localStorage['annoyances'], closepage: localStorage['classicoptions'], rating: localStorage['rating'], temp: sessionlist, blockeditems: ITEMS[request.tid]['blocked'], alloweditems: ITEMS[request.tid]['allowed']});
+		sendResponse({status: localStorage['enable'], enable: enableval, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], annoyances: localStorage['annoyances'], closepage: localStorage['classicoptions'], rating: localStorage['rating'], temp: sessionlist, blockeditems: ITEMS[request.tid]['blocked'], alloweditems: ITEMS[request.tid]['allowed'], domainsort: localStorage['domainsort']});
 		changed = true;
 	} else if (request.reqtype == 'update-blocked') {
 		updateCount(sender.tab.id);
@@ -376,7 +406,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 });
 
 setDefaultOptions();
-initSearch();
+//initSearch();
 
 if (!optionExists("version") || localStorage["version"] != version) {
 	//chrome.tabs.create({ url: chrome.extension.getURL('updated.html'), selected: false });
