@@ -48,6 +48,7 @@ function loadOptions() {
 	loadCheckbox("classicoptions");
 	loadCheckbox("referrer");
 	loadCheckbox("rating");
+	loadCheckbox("domainsort");
 	loadElement("linktarget");
 	//loadElement("search");
 	listUpdate();
@@ -76,6 +77,7 @@ function saveOptions() {
 	saveElement("linktarget");
 	//saveElement("search");
 	saveCheckbox("rating");
+	saveCheckbox("domainsort");
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
 	updateExport();
@@ -225,8 +227,9 @@ function listUpdate() {
 	var whitelistCompiled = '';
 	if (whiteList.length==0) whitelistCompiled = '[none]';
 	else {
-		whiteList.sort();
-		for(i in whiteList) {
+		if (localStorage['domainsort'] == 'true') whiteList = bkg.domainSort(whiteList);
+		else whiteList.sort();
+		for (i in whiteList) {
 			if ((whiteList[i][0] == '*' && whiteList[i][1] == '.') || whiteList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
 			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'allowTop("'+whiteList[i]+'")\'>Trust</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
 		}
@@ -234,8 +237,9 @@ function listUpdate() {
 	var blacklistCompiled = '';
 	if (blackList.length==0) blacklistCompiled = '[none]';
 	else {
-		blackList.sort();
-		for(i in blackList) {
+		if (localStorage['domainsort'] == 'true') blackList = bkg.domainSort(blackList);
+		else blackList.sort();
+		for (i in blackList) {
 			if ((blackList[i][0] == '*' && blackList[i][1] == '.') || blackList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
 			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'allowTop("'+blackList[i]+'")\'>Trust</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
 		}
