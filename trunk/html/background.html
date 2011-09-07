@@ -61,7 +61,6 @@ function domainCheck(domain, req) {
 	}
 	domainname = extractDomainFromURL(domain.toLowerCase());
 	if (domainname.indexOf(".") == -1 && domain.indexOf(".") != -1) domainname = domain.toLowerCase();
-	console.log(domainname);
 	var blackList = JSON.parse(localStorage['blackList']);
 	var whiteList = JSON.parse(localStorage['whiteList']);
 	var blackListSession = JSON.parse(sessionStorage['blackList']);
