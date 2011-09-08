@@ -60,7 +60,6 @@ function domainCheck(domain, req) {
 		if ((localStorage['annoyances'] == 'true' && localStorage['annoyancesmode'] == 'strict' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) return '1';
 	}
 	domainname = extractDomainFromURL(domain.toLowerCase());
-	if (domainname.indexOf(".") == -1 && domain.indexOf(".") != -1) domainname = domain.toLowerCase();
 	var blackList = JSON.parse(localStorage['blackList']);
 	var whiteList = JSON.parse(localStorage['whiteList']);
 	var blackListSession = JSON.parse(sessionStorage['blackList']);
