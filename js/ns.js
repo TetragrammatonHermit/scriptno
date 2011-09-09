@@ -33,13 +33,13 @@ function block(event) {
 	var el = event.target;
 	var elType = el.nodeName.toUpperCase();
 	var elSrc = getElSrc(el);
-	if (elSrc && elementStatus(elSrc, SETTINGS['MODE']) && (elType == "A" || elType == "IFRAME" || elType == "FRAME" || elType == "EMBED" || elType == "OBJECT" || elType == "SCRIPT" || elType == "IMG") && (((((elType == "IFRAME" && SETTINGS['IFRAME'] == 'true') || (elType == "FRAME" && SETTINGS['FRAME'] == 'true') || (elType == "EMBED" && SETTINGS['EMBED'] == 'true') || (elType == "OBJECT" && SETTINGS['OBJECT'] == 'true') || (elType == "SCRIPT" && SETTINGS['SCRIPT'] == 'true') || (elType == "VIDEO" && SETTINGS['VIDEO'] == 'true') || (elType == "AUDIO" && SETTINGS['AUDIO'] == 'true') || (elType == "IMG" && SETTINGS['IMAGE'] == 'true') || (elType == "A" && SETTINGS['REFERRER'] == 'true')) && ((SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1')) || SETTINGS['PRESERVESAMEDOMAIN'] == 'false')) || ((SETTINGS['ANNOYANCES'] == 'true' && (SETTINGS['ANNOYANCESMODE'] == 'strict' || (SETTINGS['ANNOYANCESMODE'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) != '0')) && baddies(elSrc, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '1') || (SETTINGS['ANTISOCIAL'] == 'true' && baddies(elSrc, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '2'))) || ((SETTINGS['WEBBUGS'] == 'true' && (elType == "IMG" || elType == "IFRAME" || elType == "EMBED" || elType == "OBJECT") && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1') && ((typeof $(el).attr('width') !== 'undefined' && $(el).attr('width') <= 5 && typeof $(el).attr('height') !== 'undefined' && $(el).attr('height') <= 5) || (typeof $(el).attr('style') !== 'undefined' && $(el).attr('style').match(/(.*?;\s*|^\s*?)(height|width)\s*?:\s*?[0-5]\D.*?;\s*(height|width)\s*?:\s*?[0-5]\D/i)))) || SETTINGS['WEBBUGS'] == 'false') || ((SETTINGS['REFERRER'] == 'true' && elType == "A" && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1')) || SETTINGS['REFERRER'] == 'false'))) {
+	if (elSrc && elementStatus(elSrc, SETTINGS['MODE']) && (elType == "A" || elType == "IFRAME" || elType == "FRAME" || elType == "EMBED" || elType == "OBJECT" || elType == "SCRIPT" || elType == "IMG") && (((((elType == "IFRAME" && SETTINGS['IFRAME'] == 'true') || (elType == "FRAME" && SETTINGS['FRAME'] == 'true') || (elType == "EMBED" && SETTINGS['EMBED'] == 'true') || (elType == "OBJECT" && SETTINGS['OBJECT'] == 'true') || (elType == "SCRIPT" && SETTINGS['SCRIPT'] == 'true') || (elType == "VIDEO" && SETTINGS['VIDEO'] == 'true') || (elType == "AUDIO" && SETTINGS['AUDIO'] == 'true') || (elType == "IMG" && SETTINGS['IMAGE'] == 'true') || (elType == "A" && SETTINGS['REFERRER'] == 'true')) && ((SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1')) || SETTINGS['PRESERVESAMEDOMAIN'] == 'false')) || ((SETTINGS['ANNOYANCES'] == 'true' && (SETTINGS['ANNOYANCESMODE'] == 'strict' || (SETTINGS['ANNOYANCESMODE'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) != '0')) && baddies(elSrc, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '1') || (SETTINGS['ANTISOCIAL'] == 'true' && baddies(elSrc, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '2'))) || ((SETTINGS['WEBBUGS'] == 'true' && (elType == "IMG" || elType == "IFRAME" || elType == "EMBED" || elType == "OBJECT") && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1') && ((typeof $(el).attr('width') !== 'undefined' && $(el).attr('width') <= 5 && typeof $(el).attr('height') !== 'undefined' && $(el).attr('height') <= 5) || (typeof $(el).attr('style') !== 'undefined' && $(el).attr('style').match(/(.*?;\s*|^\s*?)(height|width)\s*?:\s*?[0-5]\D.*?;\s*(height|width)\s*?:\s*?[0-5]\D/i)))) || SETTINGS['WEBBUGS'] == 'false') || ((SETTINGS['REFERRER'] == 'true' && elType == "A" && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1')) || SETTINGS['REFERRER'] == 'false'))) {
 		//console.log("BLOCKED: "+elSrc+" | "+elType);
-		if (SETTINGS['REFERRER'] == 'true' && elType == "A" && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1')) {
+		if (SETTINGS['REFERRER'] == 'true' && elType == "A" && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1')) {
 			$(el).attr("rel","noreferrer");
 		} else {
 			event.preventDefault();
-			if (SETTINGS['WEBBUGS'] == 'true' && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1') && (elType == "IFRAME" || elType == "EMBED" || elType == "OBJECT" || elType == "IMG") && ((typeof $(el).attr('width') !== 'undefined' && $(el).attr('width') <= 5 && typeof $(el).attr('height') !== 'undefined' && $(el).attr('height') <= 5) || (typeof $(el).attr('style') !== 'undefined' && $(el).attr('style').match(/(.*?;\s*|^\s*?)(height|width)\s*?:\s*?[0-5]\D.*?;\s*(height|width)\s*?:\s*?[0-5]\D/i)))) elType = "WEBBUG";
+			if (SETTINGS['WEBBUGS'] == 'true' && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1') && (elType == "IFRAME" || elType == "EMBED" || elType == "OBJECT" || elType == "IMG") && ((typeof $(el).attr('width') !== 'undefined' && $(el).attr('width') <= 5 && typeof $(el).attr('height') !== 'undefined' && $(el).attr('height') <= 5) || (typeof $(el).attr('style') !== 'undefined' && $(el).attr('style').match(/(.*?;\s*|^\s*?)(height|width)\s*?:\s*?[0-5]\D.*?;\s*(height|width)\s*?:\s*?[0-5]\D/i)))) elType = "WEBBUG";
 			$(el).remove();
 			chrome.extension.sendRequest({reqtype: "update-blocked", src: elSrc, node: elType});
 		}
@@ -52,7 +52,7 @@ function block(event) {
 }
 function postLoadCheck(el) {
 	elSrc = getElSrc(el);
-	if (elSrc && elementStatus(elSrc, SETTINGS['MODE']) && ((SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1')) || SETTINGS['PRESERVESAMEDOMAIN'] == 'false'))
+	if (elSrc && elementStatus(elSrc, SETTINGS['MODE']) && ((SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1')) || SETTINGS['PRESERVESAMEDOMAIN'] == 'false'))
 		return true;
 	return false;
 }
@@ -60,7 +60,7 @@ function fallbackRemover(tag) {
 	var elements = document.getElementsByTagName(tag);
 	for (var i = 0; i < elements.length; i++) {
 		elSrc = getElSrc(elements[i]);
-		if (elSrc && elementStatus(elSrc, SETTINGS['MODE']) && ((SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && (thirdParty(elSrc) || domainCheck(elSrc.toLowerCase(), 1) == '1')) || SETTINGS['PRESERVESAMEDOMAIN'] == 'false')) {
+		if (elSrc && elementStatus(elSrc, SETTINGS['MODE']) && ((SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && (thirdParty(elSrc) || domainCheck(relativeToAbsoluteUrl(elSrc).toLowerCase(), 1) == '1')) || SETTINGS['PRESERVESAMEDOMAIN'] == 'false')) {
 			if (elements[i].src)
 				elements[i].src = "";
 			if (elements[i].parentNode)
@@ -77,7 +77,7 @@ function domainCheck(domain, req) {
 	if (req === undefined) {
 		if ((SETTINGS['ANNOYANCES'] == 'true' && SETTINGS['ANNOYANCESMODE'] == 'strict' && baddies(domain, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '1') || (SETTINGS['ANTISOCIAL'] == 'true' && baddies(domain, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '2')) return '1';
 	}
-	domainname = extractDomainFromURL(relativeToAbsoluteUrl(domain.toLowerCase()));
+	domainname = extractDomainFromURL(domain.toLowerCase());
 	if (domainname.substr(0,4) == 'www.') {
 		if (SETTINGS['MODE'] == 'block' && in_array(domainname.substr(4), SETTINGS['WHITELISTSESSION'])) return '0';
 		if (SETTINGS['MODE'] == 'allow' && in_array(domainname.substr(4), SETTINGS['BLACKLISTSESSION'])) return '1';
@@ -95,7 +95,7 @@ function domainCheck(domain, req) {
 	return '-1';
 }
 function blockreferrer() {
-	$("a[rel!='noreferrer']").each(function() { if (thirdParty(getElSrc(this)) && domainCheck(getElSrc(this).toLowerCase()) != '0') { $(this).attr("rel","noreferrer"); } });
+	$("a[rel!='noreferrer']").each(function() { if (thirdParty(getElSrc(this)) && domainCheck(relativeToAbsoluteUrl(getElSrc(this)).toLowerCase()) != '0') { $(this).attr("rel","noreferrer"); } });
 }
 function scriptno() {
 	if (SETTINGS['NOSCRIPT'] == 'true' || SETTINGS['WEBBUGS'] == 'true') $("noscript").each(function() { orightml = $(this).html(); if (SETTINGS['WEBBUGS'] == 'true' && SETTINGS['NOSCRIPT'] == 'false') { matches = orightml.match(/\&lt;.*?(img|object|embed|iframe).+?src=(['"])(.*?)\2.*?(?=\/?\&gt;)/gi); if (matches) { for (i=0; i<matches.length; i++) { match = matches[i].match(/\&lt;.*?(img|object|embed|iframe).+?src=(['"])(.*?)\2.*?/i); if (match) { elurl = $.trim(match[3]); if (elurl != '' && ((window.location.hostname.substr(0,4).toLowerCase() == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())) != window.location.hostname.substr(0,4).toLowerCase()) || (window.location.hostname.substr(0,4).toLowerCase() != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != window.location.hostname.toLowerCase()) || (window.location.hostname.substr(0,4).toLowerCase() == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != window.location.hostname.toLowerCase().substr(0,4)) || (window.location.hostname.substr(0,4).toLowerCase() != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())) != window.location.hostname.toLowerCase()))) { $(this).html($(this).html().replace(elurl, "")); chrome.extension.sendRequest({reqtype: "update-blocked", src: elurl, node: 'WEBBUG'}); } } } } } if (SETTINGS['NOSCRIPT'] == 'true') { chrome.extension.sendRequest({reqtype: "update-blocked", src: orightml, node: 'NOSCRIPT'}); $(this).remove(); } }); // if webbugs are to be removed and noscripts are also to be removed, there's no need to process webbugs (img inside noscript) since the noscript element will be removed anyways
