@@ -254,6 +254,10 @@ function resetTabData(id, url) {
 		ITEMS[id]['allowed'] = [];
 	}
 }
+function revokeTemp() {
+	sessionStorage['blackList'] = JSON.stringify([]);
+	sessionStorage['whiteList'] = JSON.stringify([]);
+}
 function statuschanger() {
 	if (localStorage['enable'] == 'true') {
 		localStorage['enable'] = 'false';
@@ -361,7 +365,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 			}
 		} else {
 			requesturl = request.url;
-				if ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(requesturl, 1) != '0')) && baddies(requesturl, localStorage['annoyancesmode'], localStorage['antisocial']) == 1) || (localStorage['antisocial'] == 'true' && baddies(requesturl, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) {
+			if ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(requesturl, 1) != '0')) && baddies(requesturl, localStorage['annoyancesmode'], localStorage['antisocial']) == 1) || (localStorage['antisocial'] == 'true' && baddies(requesturl, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) {
 				// do nothing
 			} else {
 				requesttype = request.oldlist;
