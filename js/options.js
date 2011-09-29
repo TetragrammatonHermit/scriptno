@@ -142,18 +142,18 @@ function addList(type) {
 	var domain = $('#url').val();
 	var domainValidator = new RegExp('^(\\*\\.)?([a-z0-9]([a-z0-9-]*[a-z0-9])?\\.?)+[a-z0-9-]+$');
 	if (!(domainValidator.test(domain.toLowerCase()))) {
-		$('#listMsg').html('Invalid domain').stop().fadeIn("slow").delay(2000).fadeOut("slow");
+		notification('Invalid domain');
 	} else {
 		if ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && bkg.domainCheck(domain.toLowerCase(), 1) != '0')) && bkg.baddies(bkg.getDomain(domain.toLowerCase()), localStorage['annoyancesmode'], localStorage['antisocial']) == 1) || (localStorage['antisocial'] == 'true' && bkg.baddies(bkg.getDomain(domain.toLowerCase()), localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) {
-			$('#listMsg').html('Domain cannot be added as it is a provider of unwanted content (see "Block Unwanted Content" and/or "Antisocial Mode")').stop().fadeIn("slow").delay(2000).fadeOut("slow");
+			notification('Domain cannot be added as it is a provider of unwanted content (see "Block Unwanted Content" and/or "Antisocial Mode")');
 		} else {
 			responseflag = bkg.domainHandler(domain, type);
 			if (responseflag) {
 				$('#url').val('');
-				$('#listMsg').html(['Whitelisted','Blacklisted'][type]+' '+domain+'.').stop().fadeIn("slow").delay(2000).fadeOut("slow");
+				notification(['Whitelisted','Blacklisted'][type]+' '+domain+'.');
 				listUpdate();
 			} else {
-				$('#listMsg').html(domain+' not added as it already exists in the list => *.'+domain).stop().fadeIn("slow").delay(2000).fadeOut("slow");
+				notification(domain+' not added as it already exists in the list or the entire domain has been '+['whitelisted','blacklisted'][type]);
 			}
 			$('#url').focus();
 		}
@@ -168,11 +168,13 @@ function domainRemover(domain) {
 	}
 	return false;
 }
-function allowTop(domain) {
-	if (domain && !domain.match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g) && domain[0] != '*' && domain[1] != '.' && confirm("Are you sure you want to trust "+bkg.getDomain(domain)+"?\r\n\r\Click OK will mean all subdomains on "+bkg.getDomain(domain)+" will be whitelisted, such as _."+bkg.getDomain(domain)+" and even _._._."+bkg.getDomain(domain)+".")) {
-		result = bkg.allowTopHandler(domain);
+function topDomainAdd(domain, mode) {
+	if (mode == '0') lingo = 'trust';
+	else if (mode == '1') lingo = 'block';
+	if (domain && !domain.match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g) && domain[0] != '*' && domain[1] != '.' && confirm("Are you sure you want to "+lingo+" "+bkg.getDomain(domain)+"?\r\n\r\Click OK will mean all subdomains on "+bkg.getDomain(domain)+" will be "+lingo+"ed, such as _."+bkg.getDomain(domain)+" and even _._._."+bkg.getDomain(domain)+".")) {
+		result = bkg.topHandler(domain, mode);
 		listUpdate();
-		notification('Successfully trusted: '+domain);
+		notification('Successfully '+lingo+'ed: '+domain);
 	}
 }
 function hidebulk() {
@@ -181,7 +183,7 @@ function hidebulk() {
 function bulk(type) {
 	var error = false;
 	hidebulk();
-	$("#bulk").slideDown("fast");
+	if (!$("#bulk").is(":visible")) $("#bulk").slideDown("fast");
 	$("#bulk textarea").focus();
 	if (type == '0') {
 		$("#bulk strong").html("Whitelist Bulk Import");
@@ -231,7 +233,7 @@ function listUpdate() {
 		else whiteList.sort();
 		for (i in whiteList) {
 			if ((whiteList[i][0] == '*' && whiteList[i][1] == '.') || whiteList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
-			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'allowTop("'+whiteList[i]+'")\'>Trust</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
+			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+whiteList[i]+'", "0")\'>Trust Top-Level</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
 		}
 	}
 	var blacklistCompiled = '';
@@ -241,7 +243,7 @@ function listUpdate() {
 		else blackList.sort();
 		for (i in blackList) {
 			if ((blackList[i][0] == '*' && blackList[i][1] == '.') || blackList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
-			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'allowTop("'+blackList[i]+'")\'>Trust</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
+			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+blackList[i]+'", "1")\'>Block Top-Level</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
 		}
 	}
 	$('#whitelist').html(whitelistCompiled);
