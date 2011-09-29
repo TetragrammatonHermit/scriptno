@@ -11,5 +11,5 @@ Shiny New Features:
 
 == Known Issues ==
 
-  * Webbugs/"invisible images" may or may not be blocked (e.g. http://www.dslreports.com/forums/all (e.g. http://i.dslr.net/1ptrans.gif))
+  * Webbugs/"invisible images" may or may not be blocked (e.g. http://www.dslreports.com/forums/all)
   * Some pages may crash ("Aw, Snap!" message) (e.g. http://www.citytv.com/toronto/citynews)
