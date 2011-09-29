@@ -24,9 +24,11 @@ function saveElement(id) {
 	localStorage[id] = $("#"+id).val();
 }
 function loadOptions() {
-	$("#title").html("ScriptNo v"+version);
+	$("#title").html("ScriptNo (Experimental) v"+version);
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
+	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
+	else $("#useragentspoof_os").hide();
 	loadCheckbox("enable");
 	loadElement("mode");
 	loadCheckbox("refresh");
@@ -50,6 +52,10 @@ function loadOptions() {
 	loadCheckbox("rating");
 	loadCheckbox("domainsort");
 	loadElement("linktarget");
+	loadCheckbox("cookies");
+	loadElement("useragentspoof");
+	loadElement("useragentspoof_os");
+	loadElement("referrerspoof");
 	//loadElement("search");
 	listUpdate();
 }
@@ -74,12 +80,18 @@ function saveOptions() {
 	saveCheckbox("preservesamedomain");
 	saveCheckbox("classicoptions");
 	saveCheckbox("referrer");
-	saveElement("linktarget");
-	//saveElement("search");
 	saveCheckbox("rating");
+	saveCheckbox("cookies");
+	saveElement("useragentspoof");
+	saveElement("useragentspoof_os");
+	saveElement("referrerspoof");
+	saveElement("linktarget");
 	saveCheckbox("domainsort");
+	//saveElement("search");
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
+	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
+	else $("#useragentspoof_os").hide();
 	updateExport();
 	//bkg.initSearch();
 	notification('Settings saved');
