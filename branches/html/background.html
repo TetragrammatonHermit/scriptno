@@ -352,7 +352,7 @@ function setDefaultOptions() {
 	defaultOptionValue("useragentspoof", "off");
 	defaultOptionValue("useragentspoof_os", "off");
 	defaultOptionValue("referrerspoof", "domain");
-	defaultOptionValue("cookies", "false");
+	defaultOptionValue("cookies", "true");
 	if (!optionExists("blackList")) localStorage['blackList'] = JSON.stringify([]);
 	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);

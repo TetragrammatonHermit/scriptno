@@ -40,7 +40,7 @@
 				</td></tr>
 				<tr><td colspan="2" class="section">Privacy Settings</td></tr>
 				<tr><td class="rowtitle"><label for="annoyances">Block Unwanted Content</label>:</td><td><input type="checkbox" id="annoyances" onClick="saveOptions()" /> <i>(Default: enabled; remove unwanted content from known ad / malware domains; domains gathered from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</i></td></tr>
-				<tr><td class="rowtitle"><label for="cookies">Block Unwanted Cookies</label>:</td><td><input type="checkbox" id="cookies" onClick="saveOptions()" /> <i>(Default: disabled; blocks third-party/unwanted cookies; below mode applies to this as well)</i></td></tr>
+				<tr><td class="rowtitle"><label for="cookies">Block Unwanted Cookies</label>:</td><td><input type="checkbox" id="cookies" onClick="saveOptions()" /> <i>(Default: enabled; blocks cookies from known ad / malware domains; below mode applies to this as well)</i></td></tr>
 				<tr id="annoyancesmoderow" class="hide"><td class="rowtitle"><label for="annoyancesmode">Unwanted Content Mode</label>:</td><td><select id="annoyancesmode" onchange="saveOptions()">
 					<option value="relaxed">Relaxed</option>
 					<option value="strict">Strict</option>
