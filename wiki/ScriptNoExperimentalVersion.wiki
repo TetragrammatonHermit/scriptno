@@ -2,6 +2,8 @@
 
 = ScriptNo - Experimental Version =
 
+As I cannot update this to the Chrome Extensions Gallery (because it uses an experimental API), you'll have to download this manually and install it.
+
 Shiny New Features:
   * Block Unwanted Cookies - block cookies from being set by domains in the unwanted content domain list (Default: Disabled)
   * User-Agent Spoof - spoof your browser and operating system (Default: Disabled)
