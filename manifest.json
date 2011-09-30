@@ -24,5 +24,5 @@
    "options_page": "html/options.html",
    "permissions": [ "http://*/*", "https://*/*", "tabs" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.0.5.42"
+   "version": "1.0.5.43"
 }
