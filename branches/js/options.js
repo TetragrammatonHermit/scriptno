@@ -245,7 +245,7 @@ function listUpdate() {
 		else whiteList.sort();
 		for (i in whiteList) {
 			if ((whiteList[i][0] == '*' && whiteList[i][1] == '.') || whiteList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
-			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+whiteList[i]+'", "0")\'>Trust Top-Level</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
+			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+whiteList[i]+'", "0")\'>Trust Domain</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
 		}
 	}
 	var blacklistCompiled = '';
@@ -255,7 +255,7 @@ function listUpdate() {
 		else blackList.sort();
 		for (i in blackList) {
 			if ((blackList[i][0] == '*' && blackList[i][1] == '.') || blackList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
-			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+blackList[i]+'", "1")\'>Block Top-Level</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
+			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+blackList[i]+'", "1")\'>Block Domain</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
 		}
 	}
 	$('#whitelist').html(whitelistCompiled);
