@@ -182,7 +182,7 @@ function domainRemover(domain) {
 }
 function topDomainAdd(domain, mode) {
 	if (mode == '0') lingo = 'trust';
-	else if (mode == '1') lingo = 'block';
+	else if (mode == '1') lingo = 'distrust';
 	if (domain && !domain.match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g) && domain[0] != '*' && domain[1] != '.' && confirm("Are you sure you want to "+lingo+" "+bkg.getDomain(domain)+"?\r\n\r\Click OK will mean all subdomains on "+bkg.getDomain(domain)+" will be "+lingo+"ed, such as _."+bkg.getDomain(domain)+" and even _._._."+bkg.getDomain(domain)+".")) {
 		result = bkg.topHandler(domain, mode);
 		listUpdate();
@@ -255,7 +255,7 @@ function listUpdate() {
 		else blackList.sort();
 		for (i in blackList) {
 			if ((blackList[i][0] == '*' && blackList[i][1] == '.') || blackList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
-			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+blackList[i]+'", "1")\'>Block Domain</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
+			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+blackList[i]+'", "1")\'>Distrust Domain</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
 		}
 	}
 	$('#whitelist').html(whitelistCompiled);
