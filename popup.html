@@ -92,7 +92,16 @@
 										blocked.push([itemdomain, bkg.domainCheck(itemdomain)]);
 										if ($('.thirds .thirditem[rel="x_'+itemdomain+'"]').length == 0) {
 											if (bkg.domainCheck(itemdomain, 1) == '1') {
-												$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist selected" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												trustval0 = '';
+												trustval1 = '';
+												if (bkg.trustCheck(itemdomain, 0)) {
+													trustval0 = ' selected';
+													allowedtype = 3;
+												} else if (bkg.trustCheck(itemdomain, 1)) {
+													trustval1 = ' selected';
+													allowedtype = 4;
+												} else allowedtype = 1;
+												$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval0+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist selected" rel="1" title="Deny">Deny</span><span class="box box2 x_trust'+trustval1+'" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												if (mode == 'allow' && bkg.in_array(itemdomain, JSON.parse(response.temp)) || (itemdomain.substr(0,4) == 'www.' && bkg.in_array(itemdomain.substr(4), JSON.parse(response.temp)))) {
 													//
 												} else {
@@ -103,14 +112,14 @@
 												if (response.blockeditems[i][1] == 'NOSCRIPT' || response.blockeditems[i][1] == 'WEBBUG') {
 													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>&lt;'+response.blockeditems[i][1]+'&gt;</span> (<span rel="count_'+itemdomain+'">1</span>)</span></div>');
 												} else {
-													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												}
 											}
 										} else {
 											$(".thirds [rel='x_"+itemdomain+"']").attr("title",$(".thirds [rel='x_"+itemdomain+"']").attr("title")+"\r\n["+response.blockeditems[i][1]+"] "+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&")));
 											$(".thirds [rel='count_"+itemdomain+"']").html((parseInt($(".thirds [rel='count_"+itemdomain+"']").html())+1));
 										}
-										if (response.rating == 'true') $("[rel='r_"+itemdomain+"']").html('<span class="wot"><span class="box box4" title="See Rating for '+bkg.getDomain(itemdomain)+'"><a href="http://www.mywot.com/en/scorecard/'+itemdomain+'" target="_blank">Rating</a></span></span>');
+										if (response.rating == 'true') $("[rel='r_"+itemdomain+"']").html('<span class="wot"><span class="box box4" title="See Rating for '+itemdomain+'"><a href="http://www.mywot.com/en/scorecard/'+itemdomain+'" target="_blank">Rating</a></span></span>');
 										if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '2')) {
 											$(".thirds").append($(".thirds [rel='x_"+itemdomain+"']"));
 											$("[rel='"+itemdomain+"']").remove();
@@ -155,13 +164,16 @@
 										allowed.push([itemdomain, bkg.domainCheck(itemdomain)]);
 										if ($('#allowed .choices[rel="'+itemdomain+'"]').length == 0) {
 											if (bkg.domainCheck(itemdomain, 1) == '0') {
-												trustval = '';
-												if (bkg.trustCheck(itemdomain)) {
-													trustval = ' selected';
+												trustval0 = '';
+												trustval1 = '';
+												if (bkg.trustCheck(itemdomain, 0)) {
+													trustval0 = ' selected';
 													allowedtype = 3;
-												}
-												else allowedtype = 0;
-												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist selected" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												} else if (bkg.trustCheck(itemdomain, 1)) {
+													trustval1 = ' selected';
+													allowedtype = 4;
+												} else allowedtype = 0;
+												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist selected" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval0+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust'+trustval1+'" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												if (mode == 'block' && bkg.in_array(itemdomain, JSON.parse(response.temp)) || (itemdomain.substr(0,4) == 'www.' && bkg.in_array(itemdomain.substr(4), JSON.parse(response.temp)))) {
 													//
 												} else {
@@ -169,13 +181,13 @@
 													$(".x_"+itemdomain.replace(/\./g,"_")).bind("click", x_removehandle);
 												}
 											} else {
-												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 											}
 										} else {
 											$("#allowed [rel='x_"+itemdomain+"']").attr("title",$("#allowed [rel='x_"+itemdomain+"']").attr("title")+"\r\n["+response.alloweditems[i][1]+"] "+response.alloweditems[i][0]);
 											$("#allowed [rel='count_"+itemdomain+"']").html((parseInt($("#allowed [rel='count_"+itemdomain+"']").html())+1));
 										}
-										if (response.rating == 'true') $("[rel='r_"+itemdomain+"']").html('<span class="wot"><span class="box box4" title="See Rating for '+bkg.getDomain(itemdomain)+'"><a href="http://www.mywot.com/en/scorecard/'+itemdomain+'" target="_blank">Rating</a></span></span>');
+										if (response.rating == 'true') $("[rel='r_"+itemdomain+"']").html('<span class="wot"><span class="box box4" title="See Rating for '+itemdomain+'"><a href="http://www.mywot.com/en/scorecard/'+itemdomain+'" target="_blank">Rating</a></span></span>');
 									}
 									if (mode == 'block') {
 										if (bkg.in_array(itemdomain, JSON.parse(response.temp)) || (itemdomain.substr(0,4) == 'www.' && bkg.in_array(itemdomain.substr(4), JSON.parse(response.temp)))) {
@@ -219,15 +231,9 @@
 						}
 						$(".selected:not(.pbypass)").unbind("click", savehandle);
 						$(".selected:not(.x_bypass)").unbind("click", x_savehandle);
-						if (mode == 'block') {
-							$("#parent").prepend('<div class="box box1 pallow" rel="0" title="Allow Current Domain">Allow</div><div class="box box1 ptrust" rel="3" title="Trust Entire Domain">Trust</div><div class="box box2 pdeny" rel="1" title="Deny">Deny</div><div class="box box3 pbypass" rel="2" title="Temp.">Temp.</div>').attr("sn_list",response.enable);
-							$(".pallow,.pdeny,.pbypass,.ptrust").bind("click", savehandle);
-						} else if (mode == 'allow') {
-							$("#parent").prepend('<div class="box box1 pallow" rel="0" title="Allow Current Domain">Allow</div><div class="box box1 ptrust" rel="3" title="Trust Entire Domain">Trust</div><div class="box box2 pdeny" rel="1" title="Deny">Deny</div><div class="box box3 pbypass" rel="2" title="Temp.">Temp.</div>').attr("sn_list",response.enable);
-							$(".pallow,.pdeny,.pbypass,.ptrust").bind("click", savehandle);
-							$(".pbypass,.x_bypass").html("Temp.").attr("title","Temp.");
-						}
-						if (response.enable == '1') {
+						$("#parent").prepend('<div class="box box1 pallow" rel="0" title="Allow Current Domain">Allow</div><div class="box box1 ptrust" rel="3" title="Trust Entire Domain">Trust</div><div class="box box2 pdeny" rel="1" title="Deny">Deny</div><div class="box box2 ptrust" rel="4" title="Distrust Entire Domain">Distrust</div><div class="box box3 pbypass" rel="2" title="Temp.">Temp.</div>').attr("sn_list",response.enable);
+						$(".pallow,.pdeny,.pbypass,.ptrust").bind("click", savehandle);
+						if (response.enable == '1' || response.enable == '4') {
 							if (bkg.in_array(bkg.extractDomainFromURL(taburl), JSON.parse(response.temp)) || (bkg.extractDomainFromURL(taburl).substr(0,4) == 'www.' && bkg.in_array(bkg.extractDomainFromURL(taburl).substr(4), JSON.parse(response.temp)))) {
 								$(".pbypass").addClass("selected");
 								$("[rel='"+bkg.extractDomainFromURL(taburl)+"'] .x_bypass").addClass('selected');
@@ -245,13 +251,14 @@
 							} else {
 								$(".pbypass").remove();
 								$(".pdeny").unbind("click", savehandle).addClass("selected");
+								if (response.enable == '4') $(".ptrust[rel='4']").unbind("click", savehandle).addClass("selected");
 								$("#parent").append('<div class="box box4 pclear" title="Clear">Clear</div>');
 								$(".pclear").bind("click", removehandle);
 							}
 							if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == '2')) {
 								$(".pdeny").unbind("click", savehandle).addClass("selected").attr("title","Blocked (provider of unwanted content)").text("Blocked");
 								$(".pbypass").remove();
-								$(".ptrust").remove();
+								$(".ptrust[rel='3']").remove();
 								$(".pclear").remove();
 								$(".pallow").remove();
 							} else if (response.annoyances == 'true' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == 1) {
@@ -276,7 +283,7 @@
 							} else {
 								$(".pbypass").remove();
 								$(".pallow").unbind("click", savehandle).addClass("selected");
-								if (response.enable == '3') $(".ptrust").unbind("click", savehandle).addClass("selected");
+								if (response.enable == '3') $(".ptrust[rel='3']").unbind("click", savehandle).addClass("selected");
 								$("#parent").append('<div class="box box4 pclear" title="Clear">Clear</div>');
 								$(".pclear").bind("click", removehandle);
 							}
@@ -310,7 +317,7 @@
 	}
 	function remove(url, el, type) {
 		if (confirm("Are you sure you want to remove "+url+" out of your lists?")) {
-			if (bkg.trustCheck(url)) {
+			if (bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) {
 				bkg.domainHandler('*.'+bkg.getDomain(url), 2);
 				bkg.domainHandler('*.'+bkg.getDomain(url), 2, 1);
 			} else {
@@ -374,14 +381,17 @@
 		if (val < 2) chrome.extension.sendRequest({reqtype: "save", url: url, list: val});
 		else if (val == 2) {
 			processurl = url;
-			if (bkg.trustCheck(processurl)) processurl = '*.'+bkg.getDomain(processurl);
+			if (bkg.trustCheck(processurl, 0) || bkg.trustCheck(processurl, 1)) processurl = '*.'+bkg.getDomain(processurl);
 			if (el.hasClass("selected")) {
 				chrome.extension.sendRequest({reqtype: "remove-temp", url: processurl, mode: mode, oldlist: el.parent().attr("sn_list")});
 				selected = true;
 			} else chrome.extension.sendRequest({reqtype: "temp", url: processurl, mode: mode, oldlist: el.parent().attr("sn_list")});
 		} else if (val == 3) {
-			bkg.allowTopHandler(url);
+			bkg.topHandler(url, 0);
 			val = 0;
+		} else if (val == 4) {
+			bkg.topHandler(url, 1);
+			val = 1;
 		}
 		if (url == bkg.extractDomainFromURL(taburl) || (url.substr(0,4) == 'www.' && bkg.extractDomainFromURL(taburl).substr(0,4) != 'www.' && url.substr(4) == bkg.extractDomainFromURL(taburl)) || (bkg.extractDomainFromURL(taburl).substr(0,4) == 'www.' && url.substr(0,4) != 'www.' && bkg.extractDomainFromURL(taburl).substr(4) == url)) chrome.extension.sendRequest({reqtype: "refresh-page-icon", tid: tabid, type: val});
 		if (closepage == 'true') window.close();
@@ -396,7 +406,10 @@
 					if (val == 0) $("[rel='"+url.substr(4)+"'] .x_whitelist").addClass('selected').unbind("click", x_savehandle);
 					else if (val == 1) $("[rel='"+url.substr(4)+"'] .x_blacklist").addClass('selected').unbind("click", x_savehandle);
 					else if (val == 2) $("[rel='"+url.substr(4)+"'] .x_bypass").addClass('selected');
-					if (bkg.trustCheck(url)) $("[rel='"+url.substr(4)+"'] .x_trust").addClass('selected').unbind("click", x_savehandle);
+					if (bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) {
+						if (bkg.trustCheck(url, 0)) $("[rel='"+url.substr(4)+"'] .x_trust[rel='3']").addClass('selected').unbind("click", x_savehandle);
+						if (bkg.trustCheck(url, 1)) $("[rel='"+url.substr(4)+"'] .x_trust[rel='4']").addClass('selected').unbind("click", x_savehandle);
+					}
 				} else {
 					$("[rel='www."+url+"']").children().removeClass("selected").unbind("click", x_savehandle);
 					$("[rel='www."+url+"']").children().bind("click", x_savehandle);
@@ -404,7 +417,11 @@
 					if (val == 0) $("[rel='www."+url+"'] .x_whitelist").addClass('selected').unbind("click", x_savehandle);
 					else if (val == 1) $("[rel='www."+url+"'] .x_blacklist").addClass('selected').unbind("click", x_savehandle);
 					else if (val == 2) $("[rel='www."+url+"'] .x_bypass").addClass('selected');
-					if (bkg.trustCheck(url)) $("[rel='www."+url+"'] .x_trust").addClass('selected').unbind("click", x_savehandle);
+					if (bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) {
+						if (bkg.trustCheck(url, 0)) $("[rel='www."+url+"'] .x_trust[rel='3']").addClass('selected').unbind("click", x_savehandle);
+						if (bkg.trustCheck(url, 1)) $("[rel='www."+url+"'] .x_trust[rel='4']").addClass('selected').unbind("click", x_savehandle);
+						
+					}
 				}
 				$("[rel='"+url+"']").children().removeClass("selected").unbind("click", x_savehandle);
 				$("[rel='"+url+"']").children().bind("click", x_savehandle);
@@ -413,9 +430,14 @@
 				if (val == 0) $("[rel='"+url+"'] .x_whitelist").addClass('selected').unbind("click", x_savehandle);
 				else if (val == 1) $("[rel='"+url+"'] .x_blacklist").addClass('selected').unbind("click", x_savehandle);
 				else if (val == 2) $("[rel='"+url+"'] .x_bypass").addClass('selected');
-				if (bkg.trustCheck(url) && val != 1 && val != 2) {
-					$(".pallow").addClass('selected').unbind("click", savehandle);
-					$("[rel='"+url+"'] .x_trust").addClass('selected').unbind("click", x_savehandle);
+				if ((bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) && val != 2) {
+					if (bkg.trustCheck(url, 0)) {
+						$(".pallow").addClass('selected').unbind("click", savehandle);
+						$("[rel='"+url+"'] .x_trust[rel='3']").addClass('selected').unbind("click", x_savehandle);
+					} else if (bkg.trustCheck(url, 1)) {
+						$(".pdeny").addClass('selected').unbind("click", savehandle);
+						$("[rel='"+url+"'] .x_trust[rel='4']").addClass('selected').unbind("click", x_savehandle);
+					}
 				}
 				if (val < 2) {
 					if (url.substr(0,4) == 'www.') {
@@ -452,7 +474,10 @@
 					$(".pclear").remove();
 					if (val == 0) $(".pallow").addClass('selected').unbind("click", savehandle);
 					else if (val == 1) $(".pdeny").addClass('selected').unbind("click", savehandle);
-					if (bkg.trustCheck(url) && val != 1 && val != 2) $(".ptrust").addClass('selected').unbind("click", savehandle);
+					if ((bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) && val != 2) {
+						if (bkg.trustCheck(url, 0)) $(".ptrust[rel='3']").addClass('selected').unbind("click", savehandle);
+						if (bkg.trustCheck(url, 1)) $(".ptrust[rel='4']").addClass('selected').unbind("click", savehandle);
+					}
 				}
 				if (val < 2) {
 					if (url == bkg.extractDomainFromURL(taburl) || (url.substr(0,4) == 'www.' && bkg.extractDomainFromURL(taburl).substr(0,4) != 'www.' && url.substr(4) == bkg.extractDomainFromURL(taburl)) || (bkg.extractDomainFromURL(taburl).substr(0,4) == 'www.' && url.substr(0,4) != 'www.' && bkg.extractDomainFromURL(taburl).substr(4) == url)) {
@@ -462,7 +487,10 @@
 					el.addClass('selected').unbind("click", savehandle);
 					el.parent().prepend('<span class="box box4 x_'+url.replace(/\./g,"_")+'" title="Clear">Clear</span>');
 					$(".x_"+url.replace(/\./g,"_")).bind("click", x_removehandle);
-					if (bkg.trustCheck(url) && val != 1 && val != 2) $("[rel='"+url+"'] .x_whitelist").addClass('selected').unbind("click", x_savehandle);
+					if ((bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) && val != 2) {
+						if (bkg.trustCheck(url, 0)) $("[rel='"+url+"'] .x_whitelist").addClass('selected').unbind("click", x_savehandle);
+						else if (bkg.trustCheck(url, 1)) $("[rel='"+url+"'] .x_blacklist").addClass('selected').unbind("click", x_savehandle);
+					}
 				} else {
 					if (!selected) {
 						el.addClass('selected');

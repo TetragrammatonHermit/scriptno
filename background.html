@@ -215,10 +215,13 @@ function domainSort(hosts) {
 	}
 	return hosts;
 }
-function trustCheck(domain) {
-	var blackList = JSON.parse(localStorage['blackList']);
-	var whiteList = JSON.parse(localStorage['whiteList']);
-	if (in_array(domain.toLowerCase(), whiteList) == 2 || in_array(domain.toLowerCase(), blackList) == 2) return true;
+function trustCheck(domain, mode) {
+	if (mode == 0) {
+		var list = JSON.parse(localStorage['whiteList']);
+	} else if (mode == 1) {
+		var list = JSON.parse(localStorage['blackList']);
+	}
+	if (in_array(domain.toLowerCase(), list) == 2) return true;
 	return false;
 }
 function topHandler(domain, mode) {
@@ -267,7 +270,7 @@ function domainHandler(domain,action,listtype) {
 				if (pos>-1) whiteList.splice(pos,1);
 				pos = blackList.indexOf(domain.substr(2));
 				if (pos>-1) blackList.splice(pos,1);
-				if (in_array(domain, whiteList) != 2 || in_array(domain, blackList) != 2) {
+				if ((in_array(domain, whiteList) && in_array(domain, whiteList) != 2) || (in_array(domain, blackList) && in_array(domain, blackList) != 2)) {
 					if (confirm('Previous entries detected that refer to specific sub-domains on '+domain.substr(2)+'.\r\n\r\nDo you want to delete the previous entries?')) {
 						if (action == '0') {
 							dinstances = haystackSearch(domain, whiteList);
@@ -460,7 +463,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		}
 	} else if (request.reqtype == 'get-list') {
 		enableval = domainCheck(request.url);
-		if (trustCheck(extractDomainFromURL(request.url))) enableval = 3;
+		if (trustCheck(extractDomainFromURL(request.url), 0)) enableval = 3;
+		else if (trustCheck(extractDomainFromURL(request.url), 1)) enableval = 4;
 		if (localStorage['mode'] == 'block') sessionlist = sessionStorage['whiteList'];
 		else if (localStorage['mode'] == 'allow') sessionlist = sessionStorage['blackList'];
 		sendResponse({status: localStorage['enable'], enable: enableval, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], annoyances: localStorage['annoyances'], closepage: localStorage['classicoptions'], rating: localStorage['rating'], temp: sessionlist, blockeditems: ITEMS[request.tid]['blocked'], alloweditems: ITEMS[request.tid]['allowed'], domainsort: localStorage['domainsort']});
