@@ -65,15 +65,15 @@ function domainCheck(domain, req) {
 	var blackListSession = JSON.parse(sessionStorage['blackList']);
 	var whiteListSession = JSON.parse(sessionStorage['whiteList']);
 	if (domainname.substr(0,4) == 'www.') {
-		if (localStorage['mode'] == 'block' && in_array(domainname.substr(4), whiteListSession)) return '0';
 		if (localStorage['mode'] == 'allow' && in_array(domainname.substr(4), blackListSession)) return '1';
-		if (in_array(domainname.substr(4), whiteList)) return '0';
+		if (localStorage['mode'] == 'block' && in_array(domainname.substr(4), whiteListSession)) return '0';
 		if (in_array(domainname.substr(4), blackList)) return '1';
+		if (in_array(domainname.substr(4), whiteList)) return '0';
 	} else {
-		if (localStorage['mode'] == 'block' && in_array(domainname, whiteListSession)) return '0';
 		if (localStorage['mode'] == 'allow' && in_array(domainname, blackListSession)) return '1';
-		if (in_array(domainname, whiteList)) return '0';
+		if (localStorage['mode'] == 'block' && in_array(domainname, whiteListSession)) return '0';
 		if (in_array(domainname, blackList)) return '1';
+		if (in_array(domainname, whiteList)) return '0';
 	}
 	if (req === undefined) {
 		if (localStorage['annoyances'] == 'true' && localStorage['annoyancesmode'] == 'relaxed' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') return '1';
