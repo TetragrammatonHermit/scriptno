@@ -79,15 +79,15 @@ function domainCheck(domain, req) {
 	}
 	domainname = extractDomainFromURL(domain.toLowerCase());
 	if (domainname.substr(0,4) == 'www.') {
-		if (SETTINGS['MODE'] == 'block' && in_array(domainname.substr(4), SETTINGS['WHITELISTSESSION'])) return '0';
 		if (SETTINGS['MODE'] == 'allow' && in_array(domainname.substr(4), SETTINGS['BLACKLISTSESSION'])) return '1';
-		if (in_array(domainname.substr(4), SETTINGS['WHITELIST'])) return '0';
+		if (SETTINGS['MODE'] == 'block' && in_array(domainname.substr(4), SETTINGS['WHITELISTSESSION'])) return '0';
 		if (in_array(domainname.substr(4), SETTINGS['BLACKLIST'])) return '1';
+		if (in_array(domainname.substr(4), SETTINGS['WHITELIST'])) return '0';
 	} else {
-		if (SETTINGS['MODE'] == 'block' && in_array(domainname, SETTINGS['WHITELISTSESSION'])) return '0';
 		if (SETTINGS['MODE'] == 'allow' && in_array(domainname, SETTINGS['BLACKLISTSESSION'])) return '1';
-		if (in_array(domainname, SETTINGS['WHITELIST'])) return '0';
+		if (SETTINGS['MODE'] == 'block' && in_array(domainname, SETTINGS['WHITELISTSESSION'])) return '0';
 		if (in_array(domainname, SETTINGS['BLACKLIST'])) return '1';
+		if (in_array(domainname, SETTINGS['WHITELIST'])) return '0';
 	}
 	if (req === undefined) {
 		if (SETTINGS['ANNOYANCES'] == 'true' && SETTINGS['ANNOYANCESMODE'] == 'relaxed' && baddies(domain, SETTINGS['ANNOYANCESMODE'], SETTINGS['ANTISOCIAL']) == '1') return '1';
