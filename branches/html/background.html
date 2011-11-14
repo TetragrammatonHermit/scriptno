@@ -54,6 +54,7 @@ function searchGen(text) {
 */
 if (typeof chrome.experimental !== 'undefined' && typeof chrome.experimental.webRequest !== 'undefined' && typeof chrome.experimental.contentSettings !== 'undefined') {
 	// http://dev.chromium.org/developers/design-documents/extensions/notifications-of-web-request-and-navigation
+	if (experimental == 0) experimental = 1;
 	requestTypes = ["main_frame", "sub_frame", "script", "image", "object"];
 	requestUrls = ["http://*/*", "https://*/*"]; 
 	chrome.experimental.webRequest.onBeforeSendHeaders.addListener(mitigate, {"types": requestTypes, "urls": requestUrls}, ["requestHeaders", "blocking"]);
@@ -125,7 +126,6 @@ function mitigate(req) {
 	}
 	if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true' && req.url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) {
 		chrome.experimental.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
-		if (experimental == 0) experimental = 1;
 	}
 	return { requestHeaders: req.requestHeaders };
 }
@@ -138,7 +138,7 @@ function scriptno(req) {
 					resetTabData(req.tabId, req.url);
 				}
 				// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
-				if (elementStatus(req.url, localStorage['mode'], tab.url) && ((((reqtype == "sub_frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true'))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false'))) {
+				if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && ((((reqtype == "sub_frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true'))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false'))) {
 					//console.log("BLOCKED: "+reqtype+"|"+req.url);
 					//updateCount(req.tabId);
 					//if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
@@ -414,9 +414,8 @@ chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
 				icontype = "Temp";
 			chrome.browserAction.setIcon({path: "../img/Icon"+icontype+".png", tabId: tabid});
 		} else if (changeinfo.status == "complete") {
-			if (experimental == '1' && typeof chrome.experimental !== 'undefined' && typeof chrome.experimental.contentSettings !== 'undefined') {
+			if (experimental == '1') {
 				chrome.experimental.contentSettings.javascript.clear({});
-				experimental = 0;
 			}
 			if (typeof ITEMS[tabid] !== 'undefined') {
 				chrome.tabs.executeScript(tabid, {code: 'loaded()', allFrames: true});
@@ -453,7 +452,7 @@ chrome.extension.onConnect.addListener(function(port) {
 });
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	if (request.reqtype == 'get-settings') {
-		sendResponse({status: localStorage['enable'], enable: enabled(sender.tab.url), experimental: experimental, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], whitelist: localStorage['whiteList'], blacklist: localStorage['blackList'], whitelistSession: sessionStorage['whiteList'], blackListSession: sessionStorage['blackList'], script: localStorage['script'], noscript: localStorage['noscript'], object: localStorage['object'], applet: localStorage['applet'], embed: localStorage['embed'], iframe: localStorage['iframe'], frame: localStorage['frame'], audio: localStorage['audio'], video: localStorage['video'], image: localStorage['image'], annoyances: localStorage['annoyances'], preservesamedomain: localStorage['preservesamedomain'], webbugs: localStorage['webbugs'], referrer: localStorage['referrer'], linktarget: localStorage['linktarget']});
+		sendResponse({status: localStorage['enable'], enable: enabled(sender.tab.url), experimental: chrome.experimental, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], whitelist: localStorage['whiteList'], blacklist: localStorage['blackList'], whitelistSession: sessionStorage['whiteList'], blackListSession: sessionStorage['blackList'], script: localStorage['script'], noscript: localStorage['noscript'], object: localStorage['object'], applet: localStorage['applet'], embed: localStorage['embed'], iframe: localStorage['iframe'], frame: localStorage['frame'], audio: localStorage['audio'], video: localStorage['video'], image: localStorage['image'], annoyances: localStorage['annoyances'], preservesamedomain: localStorage['preservesamedomain'], webbugs: localStorage['webbugs'], referrer: localStorage['referrer'], linktarget: localStorage['linktarget']});
 		if (typeof ITEMS[sender.tab.id] === 'undefined') {
 			resetTabData(sender.tab.id, sender.tab.url);
 		} else {

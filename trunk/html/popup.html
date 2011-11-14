@@ -31,11 +31,9 @@
 		bulk($(this));
 	};
 	var removehandle = function() {
-		port.postMessage({url: taburloriginal, tid: tabid});
 		remove(bkg.extractDomainFromURL(taburl), $(this), '0');
 	};
 	var x_removehandle = function() {
-		port.postMessage({url: taburloriginal, tid: tabid});
 		remove($(this).parent().attr("rel"), $(this), '1');
 	};
 	var savehandle = function() {
@@ -317,6 +315,7 @@
 	}
 	function remove(url, el, type) {
 		if (confirm("Are you sure you want to remove "+url+" out of your lists?")) {
+			port.postMessage({url: taburloriginal, tid: tabid});
 			if (bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) {
 				bkg.domainHandler('*.'+bkg.getDomain(url), 2);
 				bkg.domainHandler('*.'+bkg.getDomain(url), 2, 1);
@@ -325,55 +324,55 @@
 				bkg.domainHandler(url, 2, 1);
 			}
 			chrome.extension.sendRequest({reqtype: "refresh-page-icon", tid: tabid, type: 1});
-		}
-		if (closepage == 'true') window.close();
-		else {
-			if (el.parent().attr("sn_list") == '0') {
-				$("[rel='"+url+"'], #parent").attr("sn_list", "-1");
-				if (url.substr(0,4) == 'www.') {
-					$("[rel='"+url.substr(4)+"'], #parent").attr("sn_list", "-1");
-					$(".pbypass, [rel='"+url.substr(4)+"'] .x_bypass").remove();
-					$(".x_"+url.substr(4).replace(/\./g,"_")).parent().append('<span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span>');
-					$("[rel='"+url.substr(4)+"'] .x_bypass").bind("click", x_savehandle);
-				} else {
-					$("[rel='www."+url+"'], #parent").attr("sn_list", "-1");
-					$(".pbypass, [rel='www."+url+"'] .x_bypass").remove();
-					$(".x_www_"+url.replace(/\./g,"_")).parent().append('<span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span>');
-					$("[rel='www."+url+"'] .x_bypass").bind("click", x_savehandle);
+			if (closepage == 'true') window.close();
+			else {
+				if (el.parent().attr("sn_list") == '0') {
+					$("[rel='"+url+"'], #parent").attr("sn_list", "-1");
+					if (url.substr(0,4) == 'www.') {
+						$("[rel='"+url.substr(4)+"'], #parent").attr("sn_list", "-1");
+						$(".pbypass, [rel='"+url.substr(4)+"'] .x_bypass").remove();
+						$(".x_"+url.substr(4).replace(/\./g,"_")).parent().append('<span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span>');
+						$("[rel='"+url.substr(4)+"'] .x_bypass").bind("click", x_savehandle);
+					} else {
+						$("[rel='www."+url+"'], #parent").attr("sn_list", "-1");
+						$(".pbypass, [rel='www."+url+"'] .x_bypass").remove();
+						$(".x_www_"+url.replace(/\./g,"_")).parent().append('<span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span>');
+						$("[rel='www."+url+"'] .x_bypass").bind("click", x_savehandle);
+					}
+					$(".pbypass, [rel='"+url+"'] .x_bypass").remove();
+					$(".x_"+url.replace(/\./g,"_")).parent().append('<span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span>');
+					$("#parent").append('<div class="box box3 pbypass" rel="2" title="Temp.">Temp.</div>');
+					$("[rel='"+url+"'] .x_bypass").bind("click", x_savehandle);
+					$(".pbypass").bind("click", savehandle);
 				}
-				$(".pbypass, [rel='"+url+"'] .x_bypass").remove();
-				$(".x_"+url.replace(/\./g,"_")).parent().append('<span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span>');
-				$("#parent").append('<div class="box box3 pbypass" rel="2" title="Temp.">Temp.</div>');
-				$("[rel='"+url+"'] .x_bypass").bind("click", x_savehandle);
-				$(".pbypass").bind("click", savehandle);
-			}
-			if (type == '0') {
-				$(".x_"+url.replace(/\./g,"_")).parent().children().removeClass("selected").unbind("click", x_savehandle);
-				$(".x_"+url.replace(/\./g,"_")).parent().children().bind("click", x_savehandle);
-				$(".x_"+url.replace(/\./g,"_")).remove();
-				$(".pallow,.pdeny,.pbypass,.ptrust").removeClass("selected").unbind("click", savehandle);
-				$(".pallow,.pdeny,.pbypass,.ptrust").bind("click", savehandle);
-				el.remove();
-				if (url.substr(0,4) == 'www.') {
-					$(".x_"+url.substr(4).replace(/\./g,"_")).parent().children().removeClass("selected").unbind("click", x_savehandle);
-					$(".x_"+url.substr(4).replace(/\./g,"_")).parent().children().bind("click", x_savehandle);
-					$(".x_"+url.substr(4).replace(/\./g,"_")).remove();
-				} else {
-					$(".x_www_"+url.replace(/\./g,"_")).parent().children().removeClass("selected").unbind("click", x_savehandle);
-					$(".x_www_"+url.replace(/\./g,"_")).parent().children().bind("click", x_savehandle);
-					$(".x_www_"+url.replace(/\./g,"_")).remove();
-				}
-			} else if (type == '1') {
-				if (url == bkg.extractDomainFromURL(taburl) || (url.substr(0,4) == 'www.' && bkg.extractDomainFromURL(taburl).substr(0,4) != 'www.' && url.substr(4) == bkg.extractDomainFromURL(taburl)) || (bkg.extractDomainFromURL(taburl).substr(0,4) == 'www.' && url.substr(0,4) != 'www.' && bkg.extractDomainFromURL(taburl).substr(4) == url)) {
+				if (type == '0') {
+					$(".x_"+url.replace(/\./g,"_")).parent().children().removeClass("selected").unbind("click", x_savehandle);
+					$(".x_"+url.replace(/\./g,"_")).parent().children().bind("click", x_savehandle);
+					$(".x_"+url.replace(/\./g,"_")).remove();
 					$(".pallow,.pdeny,.pbypass,.ptrust").removeClass("selected").unbind("click", savehandle);
 					$(".pallow,.pdeny,.pbypass,.ptrust").bind("click", savehandle);
-					$('.pclear').remove();
+					el.remove();
+					if (url.substr(0,4) == 'www.') {
+						$(".x_"+url.substr(4).replace(/\./g,"_")).parent().children().removeClass("selected").unbind("click", x_savehandle);
+						$(".x_"+url.substr(4).replace(/\./g,"_")).parent().children().bind("click", x_savehandle);
+						$(".x_"+url.substr(4).replace(/\./g,"_")).remove();
+					} else {
+						$(".x_www_"+url.replace(/\./g,"_")).parent().children().removeClass("selected").unbind("click", x_savehandle);
+						$(".x_www_"+url.replace(/\./g,"_")).parent().children().bind("click", x_savehandle);
+						$(".x_www_"+url.replace(/\./g,"_")).remove();
+					}
+				} else if (type == '1') {
+					if (url == bkg.extractDomainFromURL(taburl) || (url.substr(0,4) == 'www.' && bkg.extractDomainFromURL(taburl).substr(0,4) != 'www.' && url.substr(4) == bkg.extractDomainFromURL(taburl)) || (bkg.extractDomainFromURL(taburl).substr(0,4) == 'www.' && url.substr(0,4) != 'www.' && bkg.extractDomainFromURL(taburl).substr(4) == url)) {
+						$(".pallow,.pdeny,.pbypass,.ptrust").removeClass("selected").unbind("click", savehandle);
+						$(".pallow,.pdeny,.pbypass,.ptrust").bind("click", savehandle);
+						$('.pclear').remove();
+					}
+					el.parent().children().removeClass("selected").unbind("click", x_savehandle);
+					el.parent().children().bind("click", x_savehandle);
+					el.remove();
 				}
-				el.parent().children().removeClass("selected").unbind("click", x_savehandle);
-				el.parent().children().bind("click", x_savehandle);
-				el.remove();
+				if (mode == 'allow') $(".pbypass,.x_bypass").html("Temp.").attr("title","Temp.");
 			}
-			if (mode == 'allow') $(".pbypass,.x_bypass").html("Temp.").attr("title","Temp.");
 		}
 	}
 	function save(url, el, type) {
