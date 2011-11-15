@@ -79,7 +79,7 @@ function mitigate(req) {
 		if (req.requestHeaders[i].name == 'User-Agent' || req.requestHeaders[i].name == 'Referer' || req.requestHeaders[i].name == 'Cookie') {
 			switch (req.requestHeaders[i].name) {
 				case 'User-Agent':
-					if (localStorage['useragentspoof'] != 'off' && enabled(req.url) == 'true') {
+					if (localStorage['useragentspoof'] != 'off' && enabled(req.url) == 'true' && req.url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) {
 						if (localStorage['useragentspoof_os'] == 'w7') os = 'Windows; U; Windows NT 6.1';
 						else if (localStorage['useragentspoof_os'] == 'wv') os = 'Windows; U; Windows NT 6.0';
 						else if (localStorage['useragentspoof_os'] == 'w2k3') os = 'Windows; U; Windows NT 5.2';
