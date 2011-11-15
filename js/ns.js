@@ -44,7 +44,7 @@ function block(event) {
 			chrome.extension.sendRequest({reqtype: "update-blocked", src: elSrc, node: elType});
 		}
 	} else {
-		if (elSrc && elSrc.toLowerCase().substr(0,11) != 'javascript:' && (elType == "IFRAME" || elType == "FRAME" || elType == "EMBED" || elType == "OBJECT" || elType == "SCRIPT")) {
+		if (elSrc && elSrc.toLowerCase().substr(0,11) != 'javascript:' && elSrc.toLowerCase().substr(0,17) != 'chrome-extension:' && (elType == "IFRAME" || elType == "FRAME" || elType == "EMBED" || elType == "OBJECT" || elType == "SCRIPT")) {
 			//console.log("ALLOWED: "+elSrc+" | "+elType);
 			chrome.extension.sendRequest({reqtype: "update-allowed", src: elSrc, node: elType});
 		}
@@ -67,7 +67,7 @@ function fallbackRemover(tag) {
 				elements[i].parentNode.removeChild(elements[i]);
 			chrome.extension.sendRequest({reqtype: "update-blocked", src: elSrc, node: tag});
 		} else {
-			if (elSrc && elSrc.toLowerCase().substr(0,11) != 'javascript:') {
+			if (elSrc) {
 				chrome.extension.sendRequest({reqtype: "update-allowed", src: elSrc, node: tag});
 			}
 		}
@@ -109,7 +109,7 @@ function scriptno() {
 	if (SETTINGS['AUDIO'] == 'true') fallbackRemover("AUDIO"); // ^
 	if (SETTINGS['SCRIPT'] == 'true') {
 		clearUnloads();
-		$("script").each(function() { if (postLoadCheck(this)) { chrome.extension.sendRequest({reqtype: "update-blocked", src: getElSrc(this), node: 'SCRIPT'}); $(this).remove(); } else { if (getElSrc(this) && getElSrc(this).toLowerCase().substr(0,11) != 'javascript:') { chrome.extension.sendRequest({reqtype: "update-allowed", src: getElSrc(this), node: "SCRIPT"}); } } });
+		$("script").each(function() { if (postLoadCheck(this)) { chrome.extension.sendRequest({reqtype: "update-blocked", src: getElSrc(this), node: 'SCRIPT'}); $(this).remove(); } else { if (getElSrc(this) && getElSrc(this).toLowerCase().substr(0,11) != 'javascript:' && getElSrc(this).toLowerCase().substr(0,17) != 'chrome-extension:') { chrome.extension.sendRequest({reqtype: "update-allowed", src: getElSrc(this), node: "SCRIPT"}); } } });
 		if ((SETTINGS['PRESERVESAMEDOMAIN'] == 'false' || (SETTINGS['PRESERVESAMEDOMAIN'] == 'true' && domainCheck(window.location.href.toLowerCase(), 1) == '1'))) {
 			$("a[href^='javascript']").attr("href","javascript:;");
 			$("[onClick]").removeAttr("onClick");
