@@ -52,11 +52,24 @@ function searchGen(text) {
 	chrome.tabs.create({ url: text, selected: true });
 }
 */
-if (typeof chrome.experimental !== 'undefined' && typeof chrome.experimental.webRequest !== 'undefined' && typeof chrome.experimental.contentSettings !== 'undefined') {
+function refreshRequestTypes() {
+	requestTypes = ['main_frame'];
+	if (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')
+		requestTypes.push('sub_frame');
+	if (localStorage['object'] == 'true' || localStorage['embed'] == 'true')
+		requestTypes.push('object');
+	if (localStorage['script'] == 'true')
+		requestTypes.push('script');
+	if (localStorage['image'] == 'true')
+		requestTypes.push('image');
+	if (localStorage['xml'] == 'true')
+		requestTypes.push('xmlhttprequest');
+}
+if (typeof chrome.experimental !== 'undefined' && typeof chrome.experimental.webRequest !== 'undefined' && typeof chrome.contentSettings !== 'undefined') {
 	// http://dev.chromium.org/developers/design-documents/extensions/notifications-of-web-request-and-navigation
 	if (experimental == 0) experimental = 1;
-	requestTypes = ["main_frame", "sub_frame", "script", "image", "object"];
-	requestUrls = ["http://*/*", "https://*/*"]; 
+	requestUrls = ["http://*/*", "https://*/*"];
+	refreshRequestTypes();
 	chrome.experimental.webRequest.onBeforeSendHeaders.addListener(mitigate, {"types": requestTypes, "urls": requestUrls}, ["requestHeaders", "blocking"]);
 	chrome.experimental.webRequest.onBeforeRequest.addListener(scriptno, {"types": requestTypes, "urls": requestUrls}, ['blocking']);
 }
@@ -125,7 +138,7 @@ function mitigate(req) {
 		}
 	}
 	if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true' && req.url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) {
-		chrome.experimental.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
+		chrome.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
 	}
 	return { requestHeaders: req.requestHeaders };
 }
@@ -138,7 +151,7 @@ function scriptno(req) {
 					resetTabData(req.tabId, req.url);
 				}
 				// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
-				if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && ((((reqtype == "sub_frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true'))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false'))) {
+				if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && ((((reqtype == "sub_frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false'))) {
 					//console.log("BLOCKED: "+reqtype+"|"+req.url);
 					//updateCount(req.tabId);
 					//if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
@@ -341,6 +354,7 @@ function setDefaultOptions() {
 	defaultOptionValue("audio", "true");
 	defaultOptionValue("video", "true");
 	defaultOptionValue("image", "false");
+	defaultOptionValue("xml", "true");
 	defaultOptionValue("annoyances", "true");
 	defaultOptionValue("annoyancesmode", "relaxed");
 	defaultOptionValue("antisocial", "false");
@@ -360,8 +374,6 @@ function setDefaultOptions() {
 	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);
 	if (typeof sessionStorage['whiteList'] === "undefined") sessionStorage['whiteList'] = JSON.stringify([]);
-	if (optionExists("removethirdparty")) // old setting (pre-v1.0.0.0)
-		delete localStorage["removethirdparty"];
 	chrome.browserAction.setBadgeBackgroundColor({color:[208, 0, 24, 255]});
 }
 function updateCount(tabId) {
@@ -415,7 +427,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
 			chrome.browserAction.setIcon({path: "../img/Icon"+icontype+".png", tabId: tabid});
 		} else if (changeinfo.status == "complete") {
 			if (experimental == '1') {
-				chrome.experimental.contentSettings.javascript.clear({});
+				chrome.contentSettings.javascript.clear({});
 			}
 			if (typeof ITEMS[tabid] !== 'undefined') {
 				chrome.tabs.executeScript(tabid, {code: 'loaded()', allFrames: true});
