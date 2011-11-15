@@ -42,6 +42,7 @@ function loadOptions() {
 	loadCheckbox("audio");
 	loadCheckbox("video");
 	loadCheckbox("image");
+	loadCheckbox("xml");
 	loadCheckbox("annoyances");
 	loadElement("annoyancesmode");
 	loadCheckbox("antisocial");
@@ -73,6 +74,7 @@ function saveOptions() {
 	saveCheckbox("audio");
 	saveCheckbox("video");
 	saveCheckbox("image");
+	saveCheckbox("xml");
 	saveCheckbox("annoyances");
 	saveElement("annoyancesmode");
 	saveCheckbox("antisocial");
@@ -94,6 +96,7 @@ function saveOptions() {
 	else $("#useragentspoof_os").hide();
 	updateExport();
 	//bkg.initSearch();
+	bkg.refreshRequestTypes();
 	notification('Settings saved');
 }
 function selectAll(id) {

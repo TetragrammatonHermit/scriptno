@@ -249,8 +249,6 @@ function setDefaultOptions() {
 	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);
 	if (typeof sessionStorage['whiteList'] === "undefined") sessionStorage['whiteList'] = JSON.stringify([]);
-	if (optionExists("removethirdparty")) // old setting (pre-v1.0.0.0)
-		delete localStorage["removethirdparty"];
 	chrome.browserAction.setBadgeBackgroundColor({color:[208, 0, 24, 255]});
 }
 function updateCount(tabId) {
