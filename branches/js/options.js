@@ -30,6 +30,7 @@ function loadOptions() {
 	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
 	else $("#useragentspoof_os").hide();
 	loadCheckbox("enable");
+	loadCheckbox("updatenotify");
 	loadElement("mode");
 	loadCheckbox("refresh");
 	loadCheckbox("script");
@@ -57,11 +58,11 @@ function loadOptions() {
 	loadElement("useragentspoof");
 	loadElement("useragentspoof_os");
 	loadElement("referrerspoof");
-	//loadElement("search");
 	listUpdate();
 }
 function saveOptions() {
 	saveCheckbox("enable");
+	saveCheckbox("updatenotify");
 	saveElement("mode");
 	saveCheckbox("refresh");
 	saveCheckbox("script");
@@ -89,13 +90,11 @@ function saveOptions() {
 	saveElement("referrerspoof");
 	saveElement("linktarget");
 	saveCheckbox("domainsort");
-	//saveElement("search");
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
 	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
 	else $("#useragentspoof_os").hide();
 	updateExport();
-	//bkg.initSearch();
 	bkg.refreshRequestTypes();
 	notification('Settings saved');
 }

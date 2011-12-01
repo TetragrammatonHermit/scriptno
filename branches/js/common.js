@@ -69,6 +69,7 @@ function extractDomainFromURL(url) { // credit: NotScripts
 }
 function getDomain(url, type) {
 	if (url && !url.match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g) && url.indexOf(".") != -1) {
+		// below line may be edited/removed in the future to support granular trust-ing
 		if (url[0] == '*' && url[1] == '.') return url.substr(2);
 		url = url.toLowerCase().split(".").reverse();
 		len = url.length;

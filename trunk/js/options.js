@@ -28,6 +28,7 @@ function loadOptions() {
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
 	loadCheckbox("enable");
+	loadCheckbox("updatenotify");
 	loadElement("mode");
 	loadCheckbox("refresh");
 	loadCheckbox("script");
@@ -50,11 +51,11 @@ function loadOptions() {
 	loadCheckbox("rating");
 	loadCheckbox("domainsort");
 	loadElement("linktarget");
-	//loadElement("search");
 	listUpdate();
 }
 function saveOptions() {
 	saveCheckbox("enable");
+	saveCheckbox("updatenotify");
 	saveElement("mode");
 	saveCheckbox("refresh");
 	saveCheckbox("script");
@@ -75,13 +76,11 @@ function saveOptions() {
 	saveCheckbox("classicoptions");
 	saveCheckbox("referrer");
 	saveElement("linktarget");
-	//saveElement("search");
 	saveCheckbox("rating");
 	saveCheckbox("domainsort");
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
 	updateExport();
-	//bkg.initSearch();
 	notification('Settings saved');
 }
 function selectAll(id) {

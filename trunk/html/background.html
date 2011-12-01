@@ -15,42 +15,6 @@ var popup = [];
 var icontype;
 var changed = false;
 const ITEMS = {};
-/*
-var searches = new Array();
-searches['google'] = ["Google SSL","https://encrypted.google.com/search?q="];
-searches['duckduckgo'] = ["DuckDuckGo SSL","https://duckduckgo.com/?kh=1&kl=wt-wt&kp=-1&k1=-1&ke=-1&ko=s&q="];
-searches['scroogle'] = ["Scroogle SSL","https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw="];
-function initSearch() {
-	chrome.omnibox.setDefaultSuggestion({description: searches[localStorage['search']][0]+': %s'});
-	chrome.omnibox.onInputChanged.removeListener(searchList); // prevent bubbling
-	chrome.omnibox.onInputChanged.addListener(searchList);
-	chrome.omnibox.onInputEntered.removeListener(searchGen); // prevent bubbling
-	chrome.omnibox.onInputEntered.addListener(searchGen);
-}
-function searchList(text, suggest) {
-	// I know, I know: below is a little hideous and violates K.I.S.S.; an array + the .splice function would have worked well, but the text variable makes things awkward
-	if (localStorage['search'] == 'google') {
-		suggest([
-			{content: searches['duckduckgo'][1]+text, description: searches['duckduckgo'][0]+': '+text},
-			{content: searches['scroogle'][1]+text, description: searches['scroogle'][0]+': '+text}
-		]);
-	} else if (localStorage['search'] == 'duckduckgo') {
-		suggest([
-			{content: searches['google'][1]+text, description: searches['google'][0]+': '+text},
-			{content: searches['scroogle'][1]+text, description: searches['scroogle'][0]+': '+text}
-		]);
-	} else if (localStorage['search'] == 'scroogle') {
-		suggest([
-			{content: searches['google'][1]+text, description: searches['google'][0]+': '+text},
-			{content: searches['duckduckgo'][1]+text, description: searches['duckduckgo'][0]+': '+text}
-		]);
-	}
-}
-function searchGen(text) {
-	if (text.substr(0,8) != 'https://') text = searches[localStorage['search']][1]+text;
-	chrome.tabs.create({ url: text, selected: true });
-}
-*/
 function enabled(url) {
 	if (localStorage["enable"] == "true" && domainCheck(url) != '0' && (domainCheck(url) == '1' || (localStorage["mode"] == "block" && domainCheck(url)) == '-1')) return 'true';
 	return 'false';
@@ -221,6 +185,7 @@ function defaultOptionValue(opt, val) {
 }
 function setDefaultOptions() {
 	defaultOptionValue("version", version);
+	defaultOptionValue("updatenotify", "true");
 	defaultOptionValue("enable", "true");
 	defaultOptionValue("mode", "block");
 	defaultOptionValue("refresh", "true");
@@ -430,11 +395,11 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 });
 
 setDefaultOptions();
-//initSearch();
 
 if (!optionExists("version") || localStorage["version"] != version) {
-	//chrome.tabs.create({ url: chrome.extension.getURL('updated.html'), selected: false });
 	localStorage["version"] = version;
+	if (localStorage["updatenotify"] == "true")
+		chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });
 }
 </script>
 </head>
