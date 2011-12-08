@@ -153,7 +153,7 @@ function notification(msg) {
 }
 // <!-- modified from KB SSL Enforcer: https://code.google.com/p/kbsslenforcer/
 function addList(type) {
-	var domain = $('#url').val();
+	var domain = $('#url').val().toLowerCase().replace("http://", "").replace("https://", "");
 	var domainValidator = new RegExp('^(\\*\\.)?([a-z0-9]([a-z0-9-]*[a-z0-9])?\\.?)+[a-z0-9-]+$');
 	if (!(domainValidator.test(domain.toLowerCase()))) {
 		notification('Invalid domain');
@@ -218,10 +218,14 @@ function importbulk(type) {
 	if (domains.length > 0) {
 		$.each(domains, function(i, v) {
 			if ($.trim(v) != "") {
-				if (domainValidator.test($.trim(v).toLowerCase())) {
-					bkg.domainHandler($.trim(v), type);
+				if ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && bkg.domainCheck($.trim(v).toLowerCase().replace("http://", "").replace("https://", ""), 1) != '0')) && bkg.baddies(bkg.getDomain($.trim(v).toLowerCase().replace("http://", "").replace("https://", "")), localStorage['annoyancesmode'], localStorage['antisocial']) == 1) || (localStorage['antisocial'] == 'true' && bkg.baddies(bkg.getDomain($.trim(v).toLowerCase().replace("http://", "").replace("https://", "")), localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) {
+					error += '<li>'+$.trim(v).toLowerCase().replace("http://", "").replace("https://", "")+' <b>(provider of unwanted content (see "Block Unwanted Content" and/or "Antisocial Mode")</b></li>';
 				} else {
-					error += '<li>'+$.trim(v)+'</li>';
+					if (domainValidator.test($.trim(v).toLowerCase().replace("http://", "").replace("https://", ""))) {
+						bkg.domainHandler($.trim(v).toLowerCase().replace("http://", "").replace("https://", ""), type);
+					} else {
+						error += '<li>'+$.trim(v).toLowerCase().replace("http://", "").replace("https://", "")+'</li>';
+					}
 				}
 			}
 		});
