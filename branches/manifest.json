@@ -22,7 +22,7 @@
    "minimum_chrome_version": "6",
    "name": "ScriptNo (Experimental)",
    "options_page": "html/options.html",
-   "permissions": [ "http://*/*", "https://*/*", "tabs", "contentSettings", "experimental" ],
+   "permissions": [ "http://*/*", "https://*/*", "tabs", "unlimitedStorage", "webRequest", "webRequestBlocking", "contentSettings", "experimental" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.0.5.50"
+   "version": "1.0.5.51"
 }

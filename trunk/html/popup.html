@@ -295,26 +295,29 @@
 		});
 	}
 	function bulk(el) {
-		if (mode == 'block') urlarray = blocked;
-		else urlarray = allowed;
+		if (mode == 'block') {
+			urlarray = blocked;
+			message = 'allow all blocked';
+		} else {
+			urlarray = allowed;
+			message = 'block all allowed';
+		}
 		if (el.hasClass("selected")) {
 			chrome.extension.sendRequest({reqtype: "remove-temp", url: urlarray, mode: mode, oldlist: el.parent().attr("sn_list")});
 			el.removeClass('selected');
 		} else {
-			if (mode == 'block') message = 'temporarily allow all blocked';
-			else message = 'temporarily block all allowed';
-			if (confirm("Are you sure you want to "+message+" resources?")) {
+			//if (confirm("Are you sure you want to temporarily "+message+" resources?")) {
 				chrome.extension.sendRequest({reqtype: "temp", url: urlarray, mode: mode, oldlist: el.parent().attr("sn_list")});
 				el.addClass('selected');
 				window.close();
-			} else {
-				chrome.extension.sendRequest({reqtype: "remove-temp", url: urlarray, mode: mode, oldlist: el.parent().attr("sn_list")});
-				el.removeClass('selected');
-			}
+			//} else {
+			//	chrome.extension.sendRequest({reqtype: "remove-temp", url: urlarray, mode: mode, oldlist: el.parent().attr("sn_list")});
+			//	el.removeClass('selected');
+			//}
 		}
 	}
 	function remove(url, el, type) {
-		if (confirm("Are you sure you want to remove "+url+" out of your lists?")) {
+		//if (confirm("Are you sure you want to remove "+url+" out of your lists?")) {
 			port.postMessage({url: taburloriginal, tid: tabid});
 			if (bkg.trustCheck(url, 0) || bkg.trustCheck(url, 1)) {
 				bkg.domainHandler('*.'+bkg.getDomain(url), 2);
@@ -373,7 +376,7 @@
 				}
 				if (mode == 'allow') $(".pbypass,.x_bypass").html("Temp.").attr("title","Temp.");
 			}
-		}
+		//}
 	}
 	function save(url, el, type) {
 		val = el.attr("rel");
