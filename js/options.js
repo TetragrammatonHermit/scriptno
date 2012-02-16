@@ -27,6 +27,8 @@ function loadOptions() {
 	$("#title").html("ScriptNo v"+version);
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
+	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
+	else $("#useragentspoof_os").hide();
 	loadCheckbox("enable");
 	loadCheckbox("updatenotify");
 	loadElement("mode");
@@ -41,6 +43,7 @@ function loadOptions() {
 	loadCheckbox("audio");
 	loadCheckbox("video");
 	loadCheckbox("image");
+	loadCheckbox("xml");
 	loadCheckbox("annoyances");
 	loadElement("annoyancesmode");
 	loadCheckbox("antisocial");
@@ -51,6 +54,10 @@ function loadOptions() {
 	loadCheckbox("rating");
 	loadCheckbox("domainsort");
 	loadElement("linktarget");
+	loadCheckbox("cookies");
+	loadElement("useragentspoof");
+	loadElement("useragentspoof_os");
+	loadElement("referrerspoof");
 	listUpdate();
 }
 function saveOptions() {
@@ -68,6 +75,7 @@ function saveOptions() {
 	saveCheckbox("audio");
 	saveCheckbox("video");
 	saveCheckbox("image");
+	saveCheckbox("xml");
 	saveCheckbox("annoyances");
 	saveElement("annoyancesmode");
 	saveCheckbox("antisocial");
@@ -75,12 +83,19 @@ function saveOptions() {
 	saveCheckbox("preservesamedomain");
 	saveCheckbox("classicoptions");
 	saveCheckbox("referrer");
-	saveElement("linktarget");
 	saveCheckbox("rating");
+	saveCheckbox("cookies");
+	saveElement("useragentspoof");
+	saveElement("useragentspoof_os");
+	saveElement("referrerspoof");
+	saveElement("linktarget");
 	saveCheckbox("domainsort");
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
+	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
+	else $("#useragentspoof_os").hide();
 	updateExport();
+	bkg.refreshRequestTypes();
 	notification('Settings saved');
 }
 function selectAll(id) {

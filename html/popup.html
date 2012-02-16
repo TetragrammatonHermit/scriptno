@@ -14,6 +14,7 @@
 	var bkg = chrome.extension.getBackgroundPage();
 	var closepage, mode, taburl, tabid;
 	var selected = false;
+	var undesirablecount = 0;
 	var blocked = [];
 	var allowed = [];
 	var statuschange = function() {
@@ -120,10 +121,16 @@
 										if (response.rating == 'true') $("[rel='r_"+itemdomain+"']").html('<span class="wot"><span class="box box4" title="See Rating for '+itemdomain+'"><a href="http://www.mywot.com/en/scorecard/'+itemdomain+'" target="_blank">Rating</a></span></span>');
 										if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '2')) {
 											$(".thirds").append($(".thirds [rel='x_"+itemdomain+"']"));
-											$("[rel='"+itemdomain+"']").remove();
-										} else if (response.annoyances == 'true' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == 1) {
+											$("[rel='"+itemdomain+"'] .box1, [rel='"+itemdomain+"'] .x_trust, [rel='"+itemdomain+"'] .box3").remove();
+											if (response.antisocial == 'true' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '2') {
+												$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Antisocial").html("Antisocial").addClass("selected");
+											} else {
+												$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Unwanted Content Provider").html("Unwanted").addClass("selected");
+											}
+											undesirablecount++;
+										} else if (response.annoyances == 'true' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '1') {
 											$("[rel='"+itemdomain+"'] .x_"+itemdomain.replace(/\./g,"_")).remove();
-											$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Blocked").html("Blocked").addClass("selected");
+											$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Unwanted Content Provider").html("Unwanted").addClass("selected");
 										}
 									}
 									if (mode == 'allow') {
@@ -134,7 +141,8 @@
 											$("[rel='"+itemdomain+"'] .x_bypass").remove();
 										}
 									}
-									$(".thirds").append($('.thirditem:has([title="Blocked"])'));
+									$(".thirds").append($('.thirditem:has([title="Unwanted Content Provider"])'));
+									$(".thirds").append($('.thirditem:has([title="Antisocial"])'));
 									$(".thirds").append($('.thirditem:not(*>:has(.choices))'));
 									$(".thirds").append($(".thirds [rel='x_web.bug']"));
 									$(".thirds").append($(".thirds [rel='x_no.script']"));
@@ -213,8 +221,13 @@
 								if (($('.thirds .thirditem').length == 1 && $('.thirds .thirditem[rel="x_no.script"]').length == 1) || ($('.thirds .thirditem').length == 1 && $('.thirds .thirditem[rel="x_web.bug"]').length == 1)) {
 									//
 								} else {
-									if (blocked.length > 0 && response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box5" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
-									else if (blocked.length > 0 && response.alloweditems.length > 0) $("#allowed").append('<br /><div class="box box5" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
+									if (blocked.length > 0 && undesirablecount != blocked.length) {
+										if (response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box5" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
+										else if (response.alloweditems.length > 0) $("#allowed").append('<br /><div class="box box5" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
+									} else {
+										if (response.alloweditems.length == 0) $(".thirds").append('<br />');
+										else if (response.alloweditems.length > 0) $("#allowed").append('<br />');
+									}
 								}
 							} else {
 								if (allowed.length > 0 && response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box5" title="Block All Allowed For Session">Block All Allowed For Session</div>');
@@ -254,9 +267,14 @@
 								$(".pclear").bind("click", removehandle);
 							}
 							if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == '2')) {
-								$(".pdeny").unbind("click", savehandle).addClass("selected").attr("title","Blocked (provider of unwanted content)").text("Blocked");
+								if (response.antisocial == 'true' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == '2') {
+									$(".pdeny").unbind("click", savehandle).addClass("selected").attr("title","Blocked (antisocial)").text("Antisocial");
+								} else {
+									$(".pdeny").unbind("click", savehandle).addClass("selected").attr("title","Blocked (provider of unwanted content)").text("Blocked");
+								}
 								$(".pbypass").remove();
 								$(".ptrust[rel='3']").remove();
+								$(".ptrust[rel='4']").remove();
 								$(".pclear").remove();
 								$(".pallow").remove();
 							} else if (response.annoyances == 'true' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == 1) {
@@ -514,7 +532,7 @@
 			<tr><td class="thirds"></td><td id="parent"></td></tr>
 		</table>
 		<div id="credit">Andrew Y. | <a href="javascript:;" onclick="openTab('http://andryou.com/2011/08/21/scriptno-a-quick-guide/'); return false;">Quick Start</a> | <a href="javascript:;" onclick="openTab('http://andryou.com/2011/08/14/scriptno/'); return false;">Overview</a> | <a href="javascript:;" onclick="openTab('http://code.google.com/p/scriptno/'); return false;">Project</a></div>
-		<div id="footer"><a href="javascript:;" onclick="openTab(chrome.extension.getURL('html/options.html')); return false;">Options</a> | <a href="javascript:;" onclick="openTab('https://chrome.google.com/webstore/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf'); return false;">ScriptNo v<span id="version"></span></a></div>
+		<div id="footer"><a href="javascript:;" onclick="openTab(chrome.extension.getURL('html/options.html')); return false;">Options</a> | <a href="javascript:;" onclick="openTab('https://chrome.google.com/webstore/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf'); return false;">ScriptNo v<span id="version"></span></a> | <span class="box box4 closebtn" title="Close Popup" onclick="window.close();">X</span></div>
 	</div>
 </body>
 </html>

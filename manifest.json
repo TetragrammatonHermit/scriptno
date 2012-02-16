@@ -11,7 +11,7 @@
       "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_start"
    } ],
-   "description": "A 'NoScript-like' extension for a safer and faster Chrome.",
+   "description": "Regain control of the web and surf more securely.",
    "icons": {
       "128": "img/icon128.png",
       "16": "img/icon16.png",
@@ -19,10 +19,10 @@
       "32": "img/icon32.png",
       "48": "img/icon48.png"
    },
-   "minimum_chrome_version": "6",
+   "minimum_chrome_version": "17.0",
    "name": "ScriptNo",
    "options_page": "html/options.html",
-   "permissions": [ "http://*/*", "https://*/*", "tabs", "unlimitedStorage" ],
+   "permissions": [ "http://*/*", "https://*/*", "tabs", "unlimitedStorage", "webRequest", "webRequestBlocking", "contentSettings" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.0.5.52"
+   "version": "1.0.6.0"
 }
