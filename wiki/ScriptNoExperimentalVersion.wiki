@@ -1,6 +1,7 @@
 #summary A page describing the experimental version.
 
 = ScriptNo - Experimental Version =
+== THIS PAGE NOW OBSOLETE (FOR NOW) DUE TO v1.0.6.0 ==
 
 As I cannot update this to the Chrome Extensions Gallery (because it uses an experimental API), you'll have to download this manually and install it.
 
