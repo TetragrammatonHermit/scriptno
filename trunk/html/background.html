@@ -15,8 +15,130 @@ var popup = [];
 var icontype;
 var changed = false;
 const ITEMS = {};
+var experimental = 0;
+function refreshRequestTypes() {
+	requestTypes = ['main_frame'];
+	if (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')
+		requestTypes.push('sub_frame');
+	if (localStorage['object'] == 'true' || localStorage['embed'] == 'true')
+		requestTypes.push('object');
+	if (localStorage['script'] == 'true')
+		requestTypes.push('script');
+	if (localStorage['image'] == 'true')
+		requestTypes.push('image');
+	if (localStorage['xml'] == 'true')
+		requestTypes.push('xmlhttprequest');
+}
+if (typeof chrome.webRequest !== 'undefined' && typeof chrome.contentSettings !== 'undefined') {
+	if (experimental == 0) experimental = 1;
+	requestUrls = ["http://*/*", "https://*/*"];
+	refreshRequestTypes();
+	if (typeof chrome.webRequest !== 'undefined') {
+		chrome.webRequest.onBeforeSendHeaders.addListener(mitigate, {"types": requestTypes, "urls": requestUrls}, ["requestHeaders", "blocking"]);
+		chrome.webRequest.onBeforeRequest.addListener(scriptno, {"types": requestTypes, "urls": requestUrls}, ['blocking']);
+	}
+}
+function mitigate(req) {
+	//console.log(req);
+	if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true') {
+		chrome.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
+	}
+	for (i = 0; i < req.requestHeaders.length; i++) {
+		if (req.requestHeaders[i].name == 'User-Agent' || req.requestHeaders[i].name == 'Referer' || req.requestHeaders[i].name == 'Cookie') {
+			switch (req.requestHeaders[i].name) {
+				case 'User-Agent':
+					if (localStorage['useragentspoof'] != 'off' && enabled(req.url) == 'true' && req.url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) {
+						if (localStorage['useragentspoof_os'] == 'w7') os = 'Windows; U; Windows NT 6.1';
+						else if (localStorage['useragentspoof_os'] == 'wv') os = 'Windows; U; Windows NT 6.0';
+						else if (localStorage['useragentspoof_os'] == 'w2k3') os = 'Windows; U; Windows NT 5.2';
+						else if (localStorage['useragentspoof_os'] == 'wxp') os = 'Windows; U; Windows NT 5.1';
+						else if (localStorage['useragentspoof_os'] == 'w98') os = 'Windows; U; Windows 98';
+						else if (localStorage['useragentspoof_os'] == 'w95') os = 'Windows; U; Windows 95';
+						else if (localStorage['useragentspoof_os'] == 'linux64') os = 'X11; U; Linux x86_64';
+						else if (localStorage['useragentspoof_os'] == 'linux32') os = 'X11; U; Linux x86_32';
+						else if (localStorage['useragentspoof_os'] == 'macsnow') os = 'Macintosh; U; Intel Mac OS X 10_6_8';
+						else if (localStorage['useragentspoof_os'] == 'chromeos') os = 'X11; U; CrOS i686 0.13.507';
+						if (localStorage['useragentspoof'] == 'chrome14')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+') AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.94 Safari/535.1';
+						else if (localStorage['useragentspoof'] == 'chrome13')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+') AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.43 Safari/535.1';
+						else if (localStorage['useragentspoof'] == 'chrome12')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+') AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.750.0 Safari/534.30';
+						else if (localStorage['useragentspoof'] == 'opera12')
+							req.requestHeaders[i].value = 'Opera/9.80 ('+os+') Presto/2.9.181 Version/12.00';
+						else if (localStorage['useragentspoof'] == 'opera11')
+							req.requestHeaders[i].value = 'Opera/9.80 ('+os+') Presto/2.9.168 Version/11.50';
+						else if (localStorage['useragentspoof'] == 'firefox6')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+'; rv:6.0a2) Gecko/20110613 Firefox/6.0a2';
+						else if (localStorage['useragentspoof'] == 'firefox5')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+'; rv:5.0) Gecko/20100101 Firefox/5.0';
+						else if (localStorage['useragentspoof'] == 'firefox4')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+'; rv:2.0.1) Gecko/20110606 Firefox/4.0.1';
+						else if (localStorage['useragentspoof'] == 'firefox3')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+'; rv:1.9.2.9) Gecko/20100913 Firefox/3.6.9';
+						else if (localStorage['useragentspoof'] == 'ie10')
+							req.requestHeaders[i].value = 'Mozilla/5.0 (compatible; MSIE 10.0; '+os+'; Trident/6.0)';
+						else if (localStorage['useragentspoof'] == 'ie9')
+							req.requestHeaders[i].value = 'Mozilla/5.0 (compatible; MSIE 9.0; '+os+')';
+						else if (localStorage['useragentspoof'] == 'ie8')
+							req.requestHeaders[i].value = 'Mozilla/4.0 (compatible; MSIE 8.0; '+os+')';
+						else if (localStorage['useragentspoof'] == 'ie7')
+							req.requestHeaders[i].value = 'Mozilla/4.0(compatible; MSIE 7.0; '+os+')';
+						else if (localStorage['useragentspoof'] == 'ie61')
+							req.requestHeaders[i].value = 'Mozilla/4.0 (compatible; MSIE 6.1; '+os+')';
+						else if (localStorage['useragentspoof'] == 'ie60')
+							req.requestHeaders[i].value = 'Mozilla/4.0 (compatible; MSIE 6.0; '+os+')';
+						else if (localStorage['useragentspoof'] == 'safari5')
+							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+') AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1';
+					}
+					break;
+				case 'Cookie':
+					if (localStorage['cookies'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial'])) 
+						req.requestHeaders[i].value = '';
+					break;
+				case 'Referer':
+					if (localStorage['referrerspoof'] == 'same')
+						req.requestHeaders[i].value = req.url;
+					else if (localStorage['referrerspoof'] == 'domain')
+						req.requestHeaders[i].value = req.url.split("//")[0]+'//'+req.url.split("/")[2];
+					break;
+			}
+		}
+	}
+	return { requestHeaders: req.requestHeaders };
+}
+function scriptno(req) {
+	//console.log(req);
+	if (req.tabId != -1) {
+		chrome.tabs.get(req.tabId, function(tab) {
+			if (tab !== 'undefined' && tab.url !== 'undefined' && tab.url.toLowerCase().substr(0,4) == 'http' && enabled(tab.url.toLowerCase())) {
+				reqtype = req.type;
+				if (typeof ITEMS[req.tabId] === 'undefined') {
+					resetTabData(req.tabId, req.url);
+				}
+				if (reqtype == "sub_frame") reqtype = 'frame';
+				else if (reqtype == "main_frame") reqtype = 'page';
+				// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
+				if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && (((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false')) || ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(req.url).toLowerCase(), 1) != '0')) && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')))) {
+					//console.log("BLOCKED: "+reqtype+"|"+req.url);
+					if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
+					ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
+					updateCount(req.tabId);
+					return { cancel: true };
+				} else {
+					if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
+						//console.log("ALLOWED: "+reqtype+"|"+req.url);
+						ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
+					}
+					return { cancel: false };
+				}
+			}
+			return { cancel: false };
+		});
+	}
+}
 function enabled(url) {
-	if (localStorage["enable"] == "true" && domainCheck(url) != '0' && (domainCheck(url) == '1' || (localStorage["mode"] == "block" && domainCheck(url)) == '-1')) return 'true';
+	if (localStorage["enable"] == "true" && domainCheck(url) != '0' && (domainCheck(url) == '1' || (localStorage["mode"] == "block" && domainCheck(url)) == '-1') && url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) return 'true';
 	return 'false';
 }
 function domainCheck(domain, req) {
@@ -47,11 +169,10 @@ function domainCheck(domain, req) {
 function domainSort(hosts) {
 	sorted_hosts = new Array();
 	split_hosts = new Array();
-	multi = false;
+	multi = 0;
 	if (hosts.length > 0) {
-		if (hosts[0].length == 2) multi = true;
-		if (multi) {
-			nodeinfo = new Array();
+		multi = hosts[0].length;
+		if (multi == 2) {
 			for (h in hosts) {
 				split_hosts.push([getDomain(extractDomainFromURL(hosts[h][0])), hosts[h][0], hosts[h][1]]);
 			}
@@ -190,7 +311,7 @@ function setDefaultOptions() {
 	defaultOptionValue("mode", "block");
 	defaultOptionValue("refresh", "true");
 	defaultOptionValue("script", "true");
-	defaultOptionValue("noscript", "true");
+	defaultOptionValue("noscript", "false");
 	defaultOptionValue("object", "true");
 	defaultOptionValue("applet", "true");
 	defaultOptionValue("embed", "true");
@@ -199,6 +320,7 @@ function setDefaultOptions() {
 	defaultOptionValue("audio", "true");
 	defaultOptionValue("video", "true");
 	defaultOptionValue("image", "false");
+	defaultOptionValue("xml", "true");
 	defaultOptionValue("annoyances", "true");
 	defaultOptionValue("annoyancesmode", "relaxed");
 	defaultOptionValue("antisocial", "false");
@@ -210,6 +332,10 @@ function setDefaultOptions() {
 	defaultOptionValue("linktarget", "off");
 	defaultOptionValue("search", "duckduckgo");
 	defaultOptionValue("domainsort", "true");
+	defaultOptionValue("useragentspoof", "off");
+	defaultOptionValue("useragentspoof_os", "off");
+	defaultOptionValue("referrerspoof", "domain");
+	defaultOptionValue("cookies", "true");
 	if (!optionExists("blackList")) localStorage['blackList'] = JSON.stringify([]);
 	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);
@@ -266,7 +392,13 @@ chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
 				icontype = "Temp";
 			chrome.browserAction.setIcon({path: "../img/Icon"+icontype+".png", tabId: tabid});
 		} else if (changeinfo.status == "complete") {
+			if (experimental == '1') {
+				chrome.contentSettings.javascript.clear({});
+			}
 			if (typeof ITEMS[tabid] !== 'undefined') {
+				if (localStorage['referrer'] == 'true') {
+					chrome.tabs.executeScript(tabid, {code: 'blockreferrer()', allFrames: true});
+				}
 				chrome.tabs.executeScript(tabid, {code: 'loaded()', allFrames: true});
 				changed = true;
 				if (localStorage['mode'] == 'block' && typeof ITEMS[tabid]['allowed'] !== 'undefined') {
@@ -301,7 +433,7 @@ chrome.extension.onConnect.addListener(function(port) {
 });
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	if (request.reqtype == 'get-settings') {
-		sendResponse({status: localStorage['enable'], enable: enabled(sender.tab.url), mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], whitelist: localStorage['whiteList'], blacklist: localStorage['blackList'], whitelistSession: sessionStorage['whiteList'], blackListSession: sessionStorage['blackList'], script: localStorage['script'], noscript: localStorage['noscript'], object: localStorage['object'], applet: localStorage['applet'], embed: localStorage['embed'], iframe: localStorage['iframe'], frame: localStorage['frame'], audio: localStorage['audio'], video: localStorage['video'], image: localStorage['image'], annoyances: localStorage['annoyances'], preservesamedomain: localStorage['preservesamedomain'], webbugs: localStorage['webbugs'], referrer: localStorage['referrer'], linktarget: localStorage['linktarget']});
+		sendResponse({status: localStorage['enable'], enable: enabled(sender.tab.url), experimental: experimental, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], whitelist: localStorage['whiteList'], blacklist: localStorage['blackList'], whitelistSession: sessionStorage['whiteList'], blackListSession: sessionStorage['blackList'], script: localStorage['script'], noscript: localStorage['noscript'], object: localStorage['object'], applet: localStorage['applet'], embed: localStorage['embed'], iframe: localStorage['iframe'], frame: localStorage['frame'], audio: localStorage['audio'], video: localStorage['video'], image: localStorage['image'], annoyances: localStorage['annoyances'], preservesamedomain: localStorage['preservesamedomain'], webbugs: localStorage['webbugs'], referrer: localStorage['referrer'], linktarget: localStorage['linktarget']});
 		if (typeof ITEMS[sender.tab.id] === 'undefined') {
 			resetTabData(sender.tab.id, sender.tab.url);
 		} else {

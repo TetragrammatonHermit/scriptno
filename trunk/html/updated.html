@@ -8,15 +8,34 @@
 <body>
 	<div id="message"></div> 
 	<div id="main">
-	<h1>Updated to v<span id="versionno"></span>! (Thursday, December 8, 2011)</h1>
-	<div style="text-align: left;">
+	<h1>Updated to v<span id="versionno"></span>! (Wednesday, February 15, 2012)</h1>
+	<div style="text-align: left; line-height: 18px; font-size: 13px;"><br />
+	Happy (belated) (Lunar) new year to everyone! I'd like to sincerely thank Steve Gibson (and Leo Laporte) for featuring and praising ScriptNo on <a href="http://twit.tv/show/security-now/339" target="_blank">Security Now #339</a>, and to all the generous individuals who have supported me. I would like to personally email all of you, but I don't have the luxury of time.
+	<br /><br />
+	Some of you asked why the donation button isn't more obvious (instead of a green heart); the main reason is I don't want to obstruct your browsing experience with "<b>PAY ME NOW</b>"-esque messages. A donation is a donation: voluntary and out of generosity (not coerced).<br /><br />
+	Without further ado, here are the additions/changes to ScriptNo in this release:
 	<ul>
-		<li>updated Options page to automatically strip out "http://" and "https://" when adding domains to the whitelist/blacklist</li>
-		<li>updated unwanted content domain list</li>
-		<li>addressed "<a href="http://code.google.com/p/scriptno/issues/detail?id=4" target="_blank">Bulk Session Allow/Block</a>" bug</li>
-		<li>updated WebRequest API references in the <a href="http://code.google.com/p/scriptno/downloads/list" target="_blank">ScriptNo Experimental build</a> to point to chrome.WebRequest instead of chrome.experimental.WebRequest (API is stable starting from Chrome 17 beta); developed fall-back support in the event your Chrome version doesn't have this API in stable yet.</li>
+		<li>Faster and more reliable blocking (webRequest and contentSettings APIs). <b>Subsequently, the minimum Chrome version requirement to use ScriptNo is now v17.0.</b></li>
+		<li>Less memory usage (no exact quantity, but it seems to be a significant decrease)</li>
+		<li>Truly blocks inline scripts</li>
+		<li>New features:<ul><li>Block Unwanted Cookies - block cookies from being set by domains in the unwanted content domain list (Default: Enabled)</li>
+		<li>User-Agent Spoof - spoof your browser and operating system (Default: Disabled)</li>
+		<li>Referrer Spoof - spoofs the referrer for all requested resources (options: Same Document, Same Domain, Off) (Default: Same Domain)</li>
+		<li>Block Cross-Domain XML - block cross-domain XML HTTP Requests (Default: Enabled)</li></ul></li>
+		<li>Shows why a domain has been blocked in the tab widget (e.g. "Unwanted" or "Antisocial")</li>
+		<li>Fixed <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=42">Issue 42</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=46">Issue 46</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=49">Issue 49</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=59">Issue 59</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=60">Issue 60</a></li>
+		<li>Updated unwanted content domains list (domains compiled and optimized from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</li>
+		<li>Some code and interface polishing</li>
+		<li>Made "Disable and Remove &lt;NOSCRIPT&gt;" disabled by default</li>
 	</ul>
-	</div> 
+	My goals for the next release:
+	<ul>
+		<li>Language translations</li>
+		<li>Cross-computer settings syncing</li>
+		<li>And, of course, fixing as many reported issues as possible</li>
+	</ul>
+	Again, thank you, and enjoy.	
+	</div>
 	<input type="button" onclick="location.href='options.html'" value="Options" />
 	<input type="button" onclick="window.open('', '_self', '');window.close();" value="Close" />
 	<br />
