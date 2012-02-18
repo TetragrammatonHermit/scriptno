@@ -4,9 +4,11 @@
 
 == 1. Why can't I install ScriptNo? ==
 
-As of v1.0.6.0, the minimum Chrome version required is 17.0 because of the fact that the webRequest and contentSettings APIs were made stable only in this milestone release.
+In ScriptNo v1.0.6.0, the minimum Chrome version required was 17.0 because of the fact that the webRequest and contentSettings APIs were made stable only in this milestone release.
 
 These two APIs make ScriptNo blocking more reliable, and support new features in v1.0.6.0 such as referrer spoofing and cookie blocking.
+
+v1.0.6.2 now removes the requirement. If you don't have Chrome v17 or higher, it will fall back to the old blocking methods. If you do have Chrome v17 or newer, ScriptNo will be smart enough to use the new blocking methods! :)
 
 == 2. Why can't I see the “Allow/Trust/Deny” options for some domains in the tab options popup? ==
 
