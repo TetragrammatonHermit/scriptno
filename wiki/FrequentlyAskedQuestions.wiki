@@ -2,7 +2,7 @@
 
 = FrequentlyAskedQuestions=
 
-== 0. "Access to data on all websites"?! What's with the permissions? ==
+== 0. "Access to data on all websites"?! What's with the scary permissions? ==
 
 http://code.google.com/chrome/extensions/permission_warnings.html
 
