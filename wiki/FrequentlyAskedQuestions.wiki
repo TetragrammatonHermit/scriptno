@@ -2,6 +2,16 @@
 
 = FrequentlyAskedQuestions=
 
+== 0. "Access to data on all websites"?! What's with the permissions? ==
+
+http://code.google.com/chrome/extensions/permission_warnings.html
+
+*Your data on all websites* = caused by the requirement of ScriptNo to function on all pages and process the page's code to remove unwanted elements. Any data doesn't leave your computer (I'm not out to betray my users!) All code is made publicly available here and is always up-to-date: http://code.google.com/p/scriptno/source/browse/trunk
+
+*Your tabs and browsing activity* = ScriptNo requires access to the chrome.tabs API for the purposes of updating the nice icon in the toolbar
+
+*Settings that specify whether websites can use features such as cookies, JavaScript, and plug-ins* = self-explanatory, since ScriptNo v1.0.6.x and higher uses the new contentSettings API to reliably block inline elements/resources.
+
 == 1. Why can't I install ScriptNo? ==
 
 In ScriptNo v1.0.6.0, the minimum Chrome version required was 17.0 because of the fact that the webRequest and contentSettings APIs were made stable only in this milestone release.
