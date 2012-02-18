@@ -16,7 +16,10 @@ I personally use a couple of Chrome extensions (e.g. Adblock Plus, LastPass) and
   * If you trust the domain and the issue occurs only on the domain, you can choose to either Whitelist or Trust it.
   * If it happens on almost every page, tick “Respect Same-Domain” AND tick “Block Unwanted Content” (second tick is optional, but HIGHLY recommended)
 
-The fundamental issue is with the contentSettings API that will (hopefully) be fixed. Apparently it has been fixed in the canary builds of Chrome: http://code.google.com/p/chromium/issues/detail?id=90843
+The fundamental issue is with the contentSettings API that will (hopefully) be fixed. Apparently it has been fixed in the canary builds of Chrome:
+http://code.google.com/p/chromium/issues/detail?id=90843
+https://bugs.webkit.org/show_bug.cgi?id=76704
+http://trac.webkit.org/changeset/106680
 
 You can also choose to set “Default Mode” to “Allow“, but this is not recommended as it will let content load by default (taking a blacklist approach)
 
