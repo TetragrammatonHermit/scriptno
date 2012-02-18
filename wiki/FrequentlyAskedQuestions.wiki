@@ -35,7 +35,7 @@ This approach (two lists) gives you flexibility, security and choice.
 == I love this extension! How do I convey this love to you? ==
 
 Thank you! I’ve put many hours into this extension to get it to this level (of course, user feedback has been helpful and important in the progress of ScriptNo). Some ways you can help ScriptNo and I out are:
-  * Translation help: one of my long-term goals is to have every ScriptNo user comfortable using it, and this means being able to use it in their own language. If you are bilingual (English + another language) and are willing to help translate the sentences in ScriptNo, contact me! (go to the top of this page to contact me)
+  * Translation help: one of my long-term goals is to have every ScriptNo user comfortable using it, and this means being able to use it in their own language. If you are bilingual (English + another language) and are willing to help translate the sentences in ScriptNo, contact me: andryou@gmail.com
   * Donations: donations are definitely welcome, but I’m personally against me aggressively soliciting them as I firmly believe it is your choice to donate or not. Whether you do is up to you, you’ll never see any nag messages in ScriptNo about doing so. You’ll just see the clickable heart icons in the ScriptNo Options page 
   * Writing: you can email me, post on the Chrome extension [https://chrome.google.com/webstore/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf wall] and rate it, and/or tweet/share/post about ScriptNo to your friends!
 
