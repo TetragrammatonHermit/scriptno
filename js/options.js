@@ -57,7 +57,11 @@ function loadOptions() {
 	loadCheckbox("cookies");
 	loadElement("useragentspoof");
 	loadElement("useragentspoof_os");
-	loadElement("referrerspoof");
+	if (localStorage['referrerspoof'] != 'same' && localStorage['referrerspoof'] != 'domain' && localStorage['referrerspoof'] != 'off') {
+		$("#referrerspoof").val('custom');
+		$("#customreferrer").show();
+		$("#userref").val(localStorage['referrerspoof']);
+	} else loadElement("referrerspoof");
 	listUpdate();
 }
 function saveOptions() {
@@ -87,7 +91,16 @@ function saveOptions() {
 	saveCheckbox("cookies");
 	saveElement("useragentspoof");
 	saveElement("useragentspoof_os");
-	saveElement("referrerspoof");
+	if ($("#referrerspoof").val() != 'custom') {
+		saveElement("referrerspoof");
+		$("#customreferrer").hide();
+	} else {
+		if ($("#userref").val() != '') localStorage['referrerspoof'] = $("#userref").val();
+		else {
+			$("#customreferrer").show();
+			$("#userref").focus;
+		}
+	}
 	saveElement("linktarget");
 	saveCheckbox("domainsort");
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
