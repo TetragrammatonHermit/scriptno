@@ -20,7 +20,11 @@ The fundamental issue is with the contentSettings API that will (hopefully) be f
 
 You can also choose to set “Default Mode” to “Allow“, but this is not recommended as it will let content load by default (taking a blacklist approach)
 
-== 4. Does ScriptNo provide a database of things to block? ==
+== 4. Counter saying that no resources have been blocked when I know they've been blocked ==
+
+In v1.0.6.0, with the implementation of true inline Javascript blocking, if the page is blocked, it will appear that no resources has been blocked, where in fact they have been blocked. You can test this out by clicking on "Temp" to temporarily allow the page to load and voila, you'll see that external resources have been blocked.
+
+== 5. Does ScriptNo provide a database of things to block? ==
 
 Yes, it does! In fact, there are two "databases" or lists (both optional):
   # Blacklist (user-configurable) - empty by default
