@@ -2,15 +2,21 @@
 
 = FrequentlyAskedQuestions=
 
-== 1. Why can't I see the “Allow/Trust/Deny” options for some domains in the tab options popup? ==
+== 1. Why can't I install it? ==
+
+As of v1.0.6.0, the minimum Chrome version required is 17.0 because of the fact that the webRequest and contentSettings APIs were made stable only in this milestone release.
+
+These two APIs make ScriptNo blocking more reliable, and support new features in v1.0.6.0 such as referrer spoofing and cookie blocking.
+
+== 2. Why can't I see the “Allow/Trust/Deny” options for some domains in the tab options popup? ==
 
 If you’ve ticked “Block Unwanted Content” and set “Unwanted Content Mode” to “Strict” in the options page, any blocked resources/elements will not have the usual “Allow/Deny/Bypass” options. If you do want to see them, you can set ”Unwanted Content Mode” to “Relaxed“.
 
-== 2. The “Ratings” button that’s under each domain in the tab options popup is UGLY! How do I get rid of it? ==
+== 3. The “Ratings” button that’s under each domain in the tab options popup is UGLY! How do I get rid of it? ==
 
 If you don’t want to see the “Rating” button for each domain, in the Options page untick “Show Rating Button“
 
-== 3. I use other Chrome extensions and they don’t work properly with ScriptNo enabled. What should I do? ==
+== 4. I use other Chrome extensions and they don’t work properly with ScriptNo enabled. What should I do? ==
 
 I personally use a couple of Chrome extensions (e.g. Adblock Plus, LastPass) and have come up with a few workarounds of my own:
   * If you trust the domain and the issue occurs only on the domain, you can choose to either Whitelist or Trust it.
@@ -23,11 +29,11 @@ http://trac.webkit.org/changeset/106680
 
 You can also choose to set “Default Mode” to “Allow“, but this is not recommended as it will let content load by default (taking a blacklist approach)
 
-== 4. The icon counter is saying that no resources have been blocked when I know they've been blocked, what's going on? ==
+== 5. The icon counter is saying that no resources have been blocked when I know they've been blocked, what's going on? ==
 
 In v1.0.6.0, with the implementation of true inline Javascript blocking, if the page is blocked, it will appear that no resources has been blocked, where in fact they have been blocked. You can test this out by clicking on "Temp" to temporarily allow the page to load and voila, you'll see that external resources have been blocked.
 
-== 5. Does ScriptNo provide a database of things to block? ==
+== 6. Does ScriptNo provide a database of things to block? ==
 
 Yes, it does! In fact, there are two "databases" or lists (both optional):
   # Blacklist (user-configurable) - empty by default
