@@ -23,7 +23,7 @@ http://trac.webkit.org/changeset/106680
 
 You can also choose to set “Default Mode” to “Allow“, but this is not recommended as it will let content load by default (taking a blacklist approach)
 
-== 4. Counter saying that no resources have been blocked when I know they've been blocked ==
+== 4. The icon counter is saying that no resources have been blocked when I know they've been blocked, what's going on? ==
 
 In v1.0.6.0, with the implementation of true inline Javascript blocking, if the page is blocked, it will appear that no resources has been blocked, where in fact they have been blocked. You can test this out by clicking on "Temp" to temporarily allow the page to load and voila, you'll see that external resources have been blocked.
 
