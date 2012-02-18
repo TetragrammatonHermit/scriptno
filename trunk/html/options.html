@@ -51,6 +51,7 @@
 				<tr><td class="rowtitle"><label for="webbugs">Remove Webbugs</label>:</td><td><input type="checkbox" id="webbugs" onClick="saveOptions()" /> <i>(Default: enabled; remove "invisible" third-party elements)</i></td></tr>
 				<tr><td class="rowtitle"><label for="referrer">Block Click-Through Referrer</label>:</td><td><input type="checkbox" id="referrer" onClick="saveOptions()" /> <i>(Default: enabled; blocks referrer information when clicking on external links)</i></td></tr>
 				<tr><td class="rowtitle"><label for="useragentspoof">User-Agent Spoof</label>:</td><td><select id="useragentspoof" onchange="saveOptions()">
+					<option value="off">-Off-</option>
 					<option value="chrome14">Chrome 14.0.835.94</option>
 					<option value="chrome13">Chrome 13.0.782.43</option>
 					<option value="chrome12">Chrome 12.0.750.0</option>
@@ -67,7 +68,6 @@
 					<option value="opera12">Opera 12.00</option>
 					<option value="opera11">Opera 11.50</option>
 					<option value="safari5">Safari 5.0.5</option>
-					<option value="off">-Off-</option>
 				</select> <select id="useragentspoof_os" onchange="saveOptions()">
 					<option value="linux64">Linux (64-bit)</option>
 					<option value="w7">Windows 7</option>
@@ -81,10 +81,11 @@
 					<option value="off">-Off-</option>
 				</select><br /><i>(Default: -Off-; spoofs your user-agent (browser and OS))</i></td></tr>
 				<tr><td class="rowtitle"><label for="referrerspoof">Referrer Spoof</label>:</td><td><select id="referrerspoof" onchange="saveOptions()">
+					<option value="off">-Off-</option>
 					<option value="same">Same Document</option>
 					<option value="domain">Same Domain</option>
-					<option value="off">-Off-</option>
-				</select> <i>(Default: Same Domain)</i></td></tr>
+					<option value="custom">Custom</option>
+				</select><br /><i>(Default: -Off-; <b>warning</b>: if enabled, may "break" some sites (e.g. logging in))</i><div id="customreferrer" class="hide"><input id="userref" value="" /> <input type="button" onclick="saveOptions()" value="Save" /></div></td></tr>
 				<!-- <tr><td class="rowtitle"><label for="search">Default SN Search Engine</label>:</td><td><select id="search" onchange="saveOptions()">
 					<option value="duckduckgo">DuckDuckGo SSL</option>
 					<option value="google">Google SSL</option>

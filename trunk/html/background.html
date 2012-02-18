@@ -101,6 +101,8 @@ function mitigate(req) {
 						req.requestHeaders[i].value = req.url;
 					else if (localStorage['referrerspoof'] == 'domain')
 						req.requestHeaders[i].value = req.url.split("//")[0]+'//'+req.url.split("/")[2];
+					else if (localStorage['referrerspoof'] != 'off')
+						req.requestHeaders[i].value = localStorage['referrerspoof'];
 					break;
 			}
 		}
@@ -111,26 +113,28 @@ function scriptno(req) {
 	//console.log(req);
 	if (req.tabId != -1) {
 		chrome.tabs.get(req.tabId, function(tab) {
-			if (tab !== 'undefined' && tab.url !== 'undefined' && tab.url.toLowerCase().substr(0,4) == 'http' && enabled(tab.url.toLowerCase())) {
-				reqtype = req.type;
-				if (typeof ITEMS[req.tabId] === 'undefined') {
-					resetTabData(req.tabId, req.url);
-				}
-				if (reqtype == "sub_frame") reqtype = 'frame';
-				else if (reqtype == "main_frame") reqtype = 'page';
-				// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
-				if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && (((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false')) || ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(req.url).toLowerCase(), 1) != '0')) && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')))) {
-					//console.log("BLOCKED: "+reqtype+"|"+req.url);
-					if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
-					ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
-					updateCount(req.tabId);
-					return { cancel: true };
-				} else {
-					if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
-						//console.log("ALLOWED: "+reqtype+"|"+req.url);
-						ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
+			if (tab !== 'undefined') {
+				if (tab.url !== 'undefined' && tab.url.toLowerCase().substr(0,4) == 'http' && enabled(tab.url.toLowerCase())) {
+					reqtype = req.type;
+					if (typeof ITEMS[req.tabId] === 'undefined') {
+						resetTabData(req.tabId, req.url);
 					}
-					return { cancel: false };
+					if (reqtype == "sub_frame") reqtype = 'frame';
+					else if (reqtype == "main_frame") reqtype = 'page';
+					// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
+					if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && (((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false')) || ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(req.url).toLowerCase(), 1) != '0')) && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')))) {
+						//console.log("BLOCKED: "+reqtype+"|"+req.url);
+						if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
+						ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
+						updateCount(req.tabId);
+						return { cancel: true };
+					} else {
+						if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
+							//console.log("ALLOWED: "+reqtype+"|"+req.url);
+							ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
+						}
+						return { cancel: false };
+					}
 				}
 			}
 			return { cancel: false };
@@ -530,6 +534,9 @@ setDefaultOptions();
 
 if (!optionExists("version") || localStorage["version"] != version) {
 	localStorage["version"] = version;
+	if (localStorage["referrerspoof"] != "off") {
+		localStorage["referrerspoof"] = "off"; // http://code.google.com/p/scriptno/issues/detail?id=73
+	}
 	if (localStorage["updatenotify"] == "true")
 		chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });
 }
