@@ -2,7 +2,7 @@
 
 = FrequentlyAskedQuestions=
 
-== 1. Why can't I install it? ==
+== 1. Why can't I install ScriptNo? ==
 
 As of v1.0.6.0, the minimum Chrome version required is 17.0 because of the fact that the webRequest and contentSettings APIs were made stable only in this milestone release.
 
