@@ -100,8 +100,8 @@ function domainCheck(domain, req) {
 function blockreferrer() {
 	$("a[rel!='noreferrer']").each(function() { if (thirdParty(getElSrc(this)) && domainCheck(relativeToAbsoluteUrl(getElSrc(this)).toLowerCase()) != '0') { $(this).attr("rel","noreferrer"); } });
 }
-function scriptno() {
-	if (SETTINGS['WEBBUGS'] == 'true') $("noscript").each(function() { orightml = $(this).html(); if (SETTINGS['WEBBUGS'] == 'true' && SETTINGS['NOSCRIPT'] == 'false') { matches = orightml.match(/\&lt;.*?(img|object|embed|iframe).+?src=(['"])(.*?)\2.*?(?=\/?\&gt;)/gi); if (matches) { for (i=0; i<matches.length; i++) { match = matches[i].match(/\&lt;.*?(img|object|embed|iframe).+?src=(['"])(.*?)\2.*?/i); if (match) { elurl = $.trim(match[3]); if (elurl != '' && ((window.location.hostname.substr(0,4).toLowerCase() == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())) != window.location.hostname.substr(0,4).toLowerCase()) || (window.location.hostname.substr(0,4).toLowerCase() != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != window.location.hostname.toLowerCase()) || (window.location.hostname.substr(0,4).toLowerCase() == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != window.location.hostname.toLowerCase().substr(0,4)) || (window.location.hostname.substr(0,4).toLowerCase() != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())) != window.location.hostname.toLowerCase()))) { $(this).html($(this).html().replace(elurl, "")); chrome.extension.sendRequest({reqtype: "update-blocked", src: elurl, node: 'WEBBUG'}); } } } } } }); // if webbugs are to be removed and noscripts are also to be removed, there's no need to process webbugs (img inside noscript) since the noscript will be removed anyways
+function ScriptSafe() {
+	if (SETTINGS['WEBBUGS'] == 'true') $("noscript").each(function() { orightml = $(this).html(); if (SETTINGS['NOSCRIPT'] == 'false') { matches = orightml.match(/\&lt;.*?(img|object|embed|iframe).+?src=(['"])(.*?)\2.*?(?=\/?\&gt;)/gi); if (matches) { for (i=0; i<matches.length; i++) { match = matches[i].match(/\&lt;.*?(img|object|embed|iframe).+?src=(['"])(.*?)\2.*?/i); if (match) { elurl = $.trim(match[3]); if (elurl != '' && ((window.location.hostname.substr(0,4).toLowerCase() == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())) != window.location.hostname.substr(0,4).toLowerCase()) || (window.location.hostname.substr(0,4).toLowerCase() != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != window.location.hostname.toLowerCase()) || (window.location.hostname.substr(0,4).toLowerCase() == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) == 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != window.location.hostname.toLowerCase().substr(0,4)) || (window.location.hostname.substr(0,4).toLowerCase() != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())).substr(0,4) != 'www.' && extractDomainFromURL(relativeToAbsoluteUrl(elurl.toLowerCase())) != window.location.hostname.toLowerCase()))) { $(this).html($(this).html().replace(elurl, "")); chrome.extension.sendRequest({reqtype: "update-blocked", src: elurl, node: 'WEBBUG'}); } } } } } }); // if webbugs are to be removed and noscripts are also to be removed, there's no need to process webbugs (img inside noscript) since the noscript will be removed anyways
 	if (SETTINGS['LINKTARGET'] != 'off') {
 		if (SETTINGS['LINKTARGET'] == 'same') linktrgt = '_self';
 		else if (SETTINGS['LINKTARGET'] == 'new') linktrgt = '_blank';
@@ -145,10 +145,10 @@ function scriptno() {
 	}
 }
 function loaded() {
-	$('body').unbind('DOMNodeInserted.scriptno');
-	$('body').bind('DOMNodeInserted.scriptno', block);
+	$('body').unbind('DOMNodeInserted.ScriptSafe');
+	$('body').bind('DOMNodeInserted.ScriptSafe', block);
 	if (SETTINGS['LISTSTATUS'] == 1 || (SETTINGS['LISTSTATUS'] == -1 && SETTINGS['MODE'] == 'block')) {
-		scriptno();
+		ScriptSafe();
 	}
 }
 function getElSrc(el) {

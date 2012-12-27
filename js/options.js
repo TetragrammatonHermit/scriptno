@@ -1,8 +1,59 @@
 // (c) Andrew Y. <andryou@gmail.com>
 // Supporting functions by AdThwart - T. Joseph
+document.addEventListener('DOMContentLoaded', function () {
+	loadOptions();
+	$(".domainRemover").click(function() { domainRemover($(this).attr('rel'));});
+	$(".topDomainAdd").click(function() { topDomainAdd($(this).attr('title'), $(this).attr('rel'));});
+	$(".save").click(saveOptions);
+	$("#domainsort").click(domainsort);
+	$("#whitebind").click(whitelistlisten);
+	$("#blackbind").click(blacklistlisten);
+	$("#whiteclear").click(whiteclear);
+	$("#blackclear").click(blackclear);
+	$("#importwhite").click(importwhite);
+	$("#importblack").click(importblack);
+	$("#hideimport").click(hidebulk);
+	$("#importsettings").click(settingsImport);
+	$("#settingsall").click(settingsall);
+	$(".savechange").change(saveOptions);
+	$(".close").click(closeOptions);
+});
+function importbulkwhite() {
+	importbulk(0);
+}
+function importbulkblack() {
+	importbulk(1);
+}
+function settingsall() {
+	selectAll('settingsexport');
+}
+function importwhite() {
+	bulk(0);
+}
+function importblack() {
+	bulk(1);
+}
+function whiteclear() {
+	listclear(0);
+}
+function blackclear() {
+	listclear(1);
+}
+function closeOptions() {
+	window.open('', '_self', '');window.close();
+}
+function whitelistlisten() {
+	addList(0);
+}
+function blacklistlisten() {
+	addList(1);
+}
+function domainsort() {
+	saveOptions();listUpdate();
+}
 var version = (function () {
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', chrome.extension.getURL('manifest.json'), false);
+	xhr.open('GET', chrome.extension.getURL('../manifest.json'), false);
 	xhr.send(null);
 	return JSON.parse(xhr.responseText).version;
 }());
@@ -24,12 +75,13 @@ function saveElement(id) {
 	localStorage[id] = $("#"+id).val();
 }
 function loadOptions() {
-	$("#title").html("ScriptNo v"+version);
+	$("#title").html("ScriptSafe v"+version);
 	if (localStorage['annoyances'] == 'true') $("#annoyancesmoderow").show();
 	else $("#annoyancesmoderow").hide();
 	if (localStorage['useragentspoof'] != 'off') $("#useragentspoof_os").show();
 	else $("#useragentspoof_os").hide();
 	loadCheckbox("enable");
+	loadCheckbox("syncenable");
 	loadCheckbox("updatenotify");
 	loadElement("mode");
 	loadCheckbox("refresh");
@@ -66,6 +118,7 @@ function loadOptions() {
 }
 function saveOptions() {
 	saveCheckbox("enable");
+	saveCheckbox("syncenable");
 	saveCheckbox("updatenotify");
 	saveElement("mode");
 	saveCheckbox("refresh");
@@ -109,6 +162,7 @@ function saveOptions() {
 	else $("#useragentspoof_os").hide();
 	updateExport();
 	bkg.refreshRequestTypes();
+	bkg.freshSync();
 	notification('Settings saved');
 }
 function selectAll(id) {
@@ -214,10 +268,10 @@ function bulk(type) {
 	$("#bulk textarea").focus();
 	if (type == '0') {
 		$("#bulk strong").html("Whitelist Bulk Import");
-		$("#bulkbtn").val("Import to Whitelist").attr("onclick","importbulk("+type+")");
+		$("#bulkbtn").val("Import to Whitelist").click(importbulkwhite);
 	} else if (type == '1') {
 		$("#bulk strong").html("Blacklist Bulk Import");
-		$("#bulkbtn").val("Import to Blacklist").attr("onclick","importbulk("+type+")");
+		$("#bulkbtn").val("Import to Blacklist").click(importbulkblack);
 	}
 }
 function importbulk(type) {
@@ -263,8 +317,8 @@ function listUpdate() {
 		if (localStorage['domainsort'] == 'true') whiteList = bkg.domainSort(whiteList);
 		else whiteList.sort();
 		for (i in whiteList) {
-			if ((whiteList[i][0] == '*' && whiteList[i][1] == '.') || whiteList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
-			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+whiteList[i]+'", "0")\'>Trust Domain</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+whiteList[i]+'")\'>X</a></div>'+whiteList[i]+'</div>';
+			if ((whiteList[i][0] == '*' && whiteList[i][1] == '.') || whiteList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" class="domainRemover" rel=\''+whiteList[i]+'\'>X</a></div>'+whiteList[i]+'</div>';
+			else whitelistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" class="topDomainAdd" title=\''+whiteList[i]+'\' rel="0">Trust Domain</a> | <a href="javascript:;" style="color:#f00;" class="domainRemover" rel=\''+whiteList[i]+'\'>X</a></div>'+whiteList[i]+'</div>';
 		}
 	}
 	var blacklistCompiled = '';
@@ -273,8 +327,8 @@ function listUpdate() {
 		if (localStorage['domainsort'] == 'true') blackList = bkg.domainSort(blackList);
 		else blackList.sort();
 		for (i in blackList) {
-			if ((blackList[i][0] == '*' && blackList[i][1] == '.') || blackList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
-			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" onclick=\'topDomainAdd("'+blackList[i]+'", "1")\'>Distrust Domain</a> | <a href="javascript:;" style="color:#f00;" onclick=\'domainRemover("'+blackList[i]+'")\'>X</a></div>'+blackList[i]+'</div>';
+			if ((blackList[i][0] == '*' && blackList[i][1] == '.') || blackList[i].match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g)) blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:#f00;" class="domainRemover" rel=\''+blackList[i]+'\'>X</a></div>'+blackList[i]+'</div>';
+			else blacklistCompiled += '<div class="listentry"><div class="entryoptions"><a href="javascript:;" style="color:green;" class="topDomainAdd" title=\''+blackList[i]+'\' rel="1">Distrust Domain</a> | <a href="javascript:;" style="color:#f00;" class="domainRemover" rel=\''+blackList[i]+'\'>X</a></div>'+blackList[i]+'</div>';
 		}
 	}
 	$('#whitelist').html(whitelistCompiled);
