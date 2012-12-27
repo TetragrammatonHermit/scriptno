@@ -1,46 +1,43 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>ScriptNo Updated</title>
+<title>ScriptSafe Updated</title>
 <link rel="stylesheet" href="../css/options.css" type="text/css" media="screen" />
 <script type="text/javascript" src="../js/jquery.js"></script>
 </head>
 <body>
 	<div id="message"></div> 
 	<div id="main">
-	<h1>Updated to v<span id="versionno"></span>! (Saturday, February 18, 2012)</h1>
+	<h1>Updated to v<span id="versionno"></span>! (Thursday, December 27, 2012)</h1>
 	<div style="text-align: left; line-height: 18px; font-size: 13px;"><br />
-	Happy (belated) (Lunar) new year to everyone! I'd like to sincerely thank Steve Gibson (and Leo Laporte) for featuring and praising ScriptNo on <a href="http://twit.tv/show/security-now/339" target="_blank">Security Now #339</a>, and to all the generous individuals who have supported me. I would like to personally email all of you, but I don't have the luxury of time.
+	I've been very busy with life, my sincere apologies for not being able to respond to questions. I've finally gotten around to updating ScriptSafe (formerly known as ScriptNo), building in a feature that many of you have been requesting: cross-device settings syncing! I hope to spend time fixing reported bugs, some of which may have been fixed with Chrome's API updates and/or the update to Manifest version 2 in this release.
 	<br /><br />
-	Some of you asked why the donation button isn't more obvious (instead of a green heart); the main reason is I don't want to obstruct your browsing experience with "<b>PAY ME NOW</b>"-esque messages. A donation is a donation: voluntary and out of generosity (not coerced).<br /><br />
-	Without further ado, here are the additions/changes to ScriptNo in this release:
+	<b>Happy Holidays to you and your loved ones, and may you have a prosperous year filled with happiness!</b><br /><br />
+	Without further ado, here are the additions/changes to ScriptSafe in this release:
 	<ul>
-		<li><b>v1.0.6.2: fall-back to previous blocking methods implemented => no more requirement to be using Chrome v17 *nod to the KNOS Project*. Don't worry, the new reliable blocking features using the new APIs will still work, if supported!</b></li>
-		<li><b>v1.0.6.1: addresses issues <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=64">64</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=66">66</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=72">72</a>, and <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=73">73</a>; able to set custom referrer values now; added FAQs link to tab popup; minor tweaks to Options page and tab popup; please check out the updated <a href="http://code.google.com/p/scriptno/wiki/FrequentlyAskedQuestions" target="_blank">FAQs page</a> to see if it answers any questions you may have :) (especially playing nicely with other extensions)</b></li>
-		<li>Less memory usage (no exact quantity, but it seems to be a significant decrease)</li>
-		<li>Truly blocks inline scripts</li>
-		<li>New features:<ul><li>Block Unwanted Cookies - block cookies from being set by domains in the unwanted content domain list (Default: Enabled)</li>
-		<li>User-Agent Spoof - spoof your browser and operating system (Default: Disabled)</li>
-		<li>Referrer Spoof - spoofs the referrer for all requested resources (options: Same Document, Same Domain, Off) (Default: Same Domain)</li>
-		<li>Block Cross-Domain XML - block cross-domain XML HTTP Requests (Default: Enabled)</li></ul></li>
-		<li>Shows why a domain has been blocked in the tab widget (e.g. "Unwanted" or "Antisocial")</li>
-		<li>Fixed <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=42">Issue 42</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=46">Issue 46</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=49">Issue 49</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=59">Issue 59</a>, <a target="_blank" href="http://code.google.com/p/scriptno/issues/detail?id=60">Issue 60</a></li>
-		<li>Updated unwanted content domains list (domains compiled and optimized from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</li>
-		<li>Some code and interface polishing</li>
-		<li>Made "Disable and Remove &lt;NOSCRIPT&gt;" disabled by default</li>
+		<li><b>v1.0.6.3: renamed to "ScriptSafe" from "ScriptNo"</b></li>
+		<li>New Features:<ul>
+			<li>Cross-Device Settings Syncing - ScriptSafe now automatically syncs your settings across all of your devices (if enabled of course!) (Default: Enabled)</li>
+			</ul>
+		</li>
+		<li>Updates:<ul>
+			<li>Code rewritten to use the new Manifest version 2 standards enforced by Google</li>
+			<li>Unwanted content domains list updated (domains compiled and optimized from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</li>
+			<li>Default whitelisting of Gmail and YouTube for new installations only (to be less disruptive for new users)</li>
+			</ul>
+		</li>
 	</ul>
 	My goals for the future:
 	<ul>
 		<li>Language translations</li>
-		<li>Cross-computer settings syncing</li>
-		<li>And, of course, fixing as many reported issues as possible</li>
+		<li>Fixing as many reported issues as possible</li>
 	</ul>
-	Again, thank you, and enjoy.	
+	Thank you, and enjoy.	
 	</div>
-	<input type="button" onclick="location.href='options.html'" value="Options" />
-	<input type="button" onclick="window.open('', '_self', '');window.close();" value="Close" />
+	<input type="button" id="loadoptionspage" value="Options" />
+	<input type="button" id="closepage" value="Close" />
 	<br />
-	<input type="button" onclick="disableNotification()" value="Don't Show This Page Again" />
+	<input type="button" id="disableNotification" value="Don't Show This Page Again" />
 	<br class="clear">
 	<br />
 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="display: inline;">
@@ -48,22 +45,8 @@
 	<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----">
 	<input type="image" src="../img/heartbig.png" border="0" name="submit" alt="Support Andrew!" title="Support Andrew!">
 	</form><br />
-	<i><a href="http://code.google.com/p/scriptno/" target="_blank">Project</a> | <a href="https://chrome.google.com/extensions/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf" target="_blank">ScriptNo on the Google Extensions Gallery</a></i>
+	<i><a href="http://code.google.com/p/scriptno/" target="_blank">Project</a> | <a href="https://chrome.google.com/extensions/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf" target="_blank">ScriptSafe on the Google Extensions Gallery</a></i>
 	</div>
-<script type="text/javascript">
-var version = (function () {
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', chrome.extension.getURL('manifest.json'), false);
-	xhr.send(null);
-	return JSON.parse(xhr.responseText).version;
-}());
-$('#versionno').html(version);
-function disableNotification() {
-	if (confirm('Are you sure you want to disable any future update notifications like this one from appearing?\r\n\r\nYou can always re-allow update notifications by going to the ScriptNo Options page and ticking the box beside "Show Update Popup".')) {
-		localStorage['updatenotify'] = 'false';
-		$('#message').html('Update notifications disabled').stop().fadeIn("slow").delay(2000).fadeOut("slow");
-	}
-}
-</script>
+	<script type="text/javascript" src="../js/updated.js"></script>
 </body>
 </html>
