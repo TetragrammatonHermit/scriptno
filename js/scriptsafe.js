@@ -541,7 +541,7 @@ chrome.storage.sync.get(null, function(changes) {
 });
 */
 function freshSync(mode, force) {
-	if (storageapi) {
+	if (storageapi && localStorage['syncenable'] == 'true') {
 		window.clearTimeout(synctimer);
 		var settingssync = {};
 		var simplesettings = '';
@@ -549,7 +549,7 @@ function freshSync(mode, force) {
 		// mode == 0 = all; 1 = settings only; 2 = whitelist/blacklist
 		//if (mode == 0 || mode == 1) {
 			for (k in localStorage) {
-				if (k != "version" && k != "sync" && k != "scriptsafe_settings" && k != "lastSync" && k != "whiteList" && k != "blackList" && k != "whiteListCount" && k != "blackListCount" && k.substr(0, 2) != "zb" && k.substr(0, 2) != "zw") {
+				if (k != "version" && k != "sync" && k != "scriptsafe_settings" && k != "lastSync" && k != "whiteList" && k != "blackList" && k != "whiteListCount" && k != "blackListCount" && k.substr(0, 10) != "whiteList_" && k.substr(0, 10) != "blackList_" && k.substr(0, 2) != "zb" && k.substr(0, 2) != "zw") {
 					simplesettings += k+"|"+localStorage[k]+"~";
 				}
 			}
@@ -588,7 +588,7 @@ function freshSync(mode, force) {
 		localStorage['lastSync'] = milliseconds;
 		settingssync['lastSync'] = milliseconds;
 		chrome.storage.sync.set(settingssync, function() {});
-		if (localStorage['syncnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
+		if (localStorage['syncnotify'] == 'true' && localStorage['syncenable'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
 		} else {
 			synctimer = window.setTimeout(function() { syncQueue() }, 30000);
 		}
@@ -722,9 +722,20 @@ function syncenable() {
 }
 if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
-	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6' || version == '1.0.6.7') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
+	// v1.0.6.3 - v1.0.6.8 - delete obsoletely named whiteList/blackList localStorage rows
+	/*
+	if (optionExists("whiteList_0")) delete localStorage['whiteList_0'];
+	if (optionExists("whiteList_1")) delete localStorage['whiteList_1'];
+	if (optionExists("whiteList_2")) delete localStorage['whiteList_2'];
+	if (optionExists("whiteList_3")) delete localStorage['whiteList_3'];
+	if (optionExists("blackList_0")) delete localStorage['blackList_0'];
+	if (optionExists("blackList_1")) delete localStorage['blackList_1'];
+	if (optionExists("blackList_2")) delete localStorage['blackList_2'];
+	if (optionExists("blackList_2")) delete localStorage['blackList_3'];
+	*/
+	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6' || version == '1.0.6.7' || version == '1.0.6.8') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
 		chrome.storage.sync.clear();
-		if (localStorage['sync'] == 'true' && localStorage['syncenable'] == 'true') {
+		if (localStorage['sync'] == 'true') {
 			listsSync(3, false, false);
 		}
 	}
