@@ -682,7 +682,7 @@ function listsSync(mode, oldLastSync, newLastSync) {
 		if (concatlist == '' || concatlistarr.length == 0) localStorage['blackList'] = JSON.stringify([]);
 		else localStorage['blackList'] = JSON.stringify(concatlistarr);
 	} else if (mode == '3') {
-		if (localStorage["whiteList_0"] || localStorage["whiteList_0"]) {
+		if (localStorage["whiteList_0"] || localStorage["blackList_0"]) {
 			if(confirm('My sincere apologies if your whitelists/blacklists were seemingly wiped out! I\'ve put together a fix.\r\n\r\nPlease press OK to restore your lists.\r\n\r\nAfterwards, please make a backup and proceed to sync your settings to your Google Account from the Options page that will open once you\'re ready.')) {
 				var concatlist;
 				concatlist = '';
@@ -690,22 +690,22 @@ function listsSync(mode, oldLastSync, newLastSync) {
 					if (localStorage['whiteList_'+i]) concatlist += localStorage['whiteList_'+i];
 				}
 				if (typeof(localStorage["whiteList_0"]) == 'string') {
-					localStorage['whiteList'] = concatlistarr;
-				} else {
 					concatlistarr = concatlist.split(",");
 					if (concatlist == '' || concatlistarr.length == 0) localStorage['whiteList'] = JSON.stringify([]);
 					else localStorage['whiteList'] = JSON.stringify(concatlistarr);
+				} else {
+					localStorage['whiteList'] = concatlist;
 				}
 				concatlist = '';
 				for (i = 0; i < 5; i++) {
 					if (localStorage['blackList_'+i]) concatlist += localStorage['blackList_'+i];
 				}
 				if (typeof(localStorage["blackList_0"]) == 'string') {
-					localStorage['blackList'] = concatlistarr;
-				} else {
 					concatlistarr = concatlist.split(",");
 					if (concatlist == '' || concatlistarr.length == 0) localStorage['blackList'] = JSON.stringify([]);
 					else localStorage['blackList'] = JSON.stringify(concatlistarr);
+				} else {
+					localStorage['blackList'] = concatlist;
 				}
 				alert('Successfully restored your settings!\r\n\r\nThe Options page will now open where you can review your whitelist/blacklist and choose to sync them to your Google Account (and/or sync from your Google Account)');
 				chrome.tabs.create({url: chrome.extension.getURL('html/options.html')});
@@ -722,7 +722,7 @@ function syncenable() {
 }
 if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
-	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
+	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6' || version == '1.0.6.7') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
 		chrome.storage.sync.clear();
 		if (localStorage['sync'] == 'true' && localStorage['syncenable'] == 'true') {
 			listsSync(3, false, false);
