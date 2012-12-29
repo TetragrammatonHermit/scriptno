@@ -5,6 +5,7 @@ var version = (function () {
 	xhr.send(null);
 	return JSON.parse(xhr.responseText).version;
 }());
+var synctimer;
 var popup = [];
 var icontype;
 var changed = false;
@@ -283,34 +284,6 @@ function domainHandler(domain,action,listtype) {
 		if (listtype == 0) {
 			localStorage['whiteList'] = JSON.stringify(whiteList);
 			localStorage['blackList'] = JSON.stringify(blackList);
-			if (storageapi == true && localStorage['syncenable'] == 'true') {
-				var settingssync = {};
-				var jsonstr = localStorage['whiteList'];
-				var i = 0;
-				var limit = chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
-				while(jsonstr.length > 0) {
-					var segment = jsonstr.substr(0, limit);
-					settingssync["whiteList_" + i] = segment;
-					localStorage["whiteList_" + i] = segment;
-					jsonstr = jsonstr.substr(limit);
-					i++;
-				}
-				settingssync['whiteListCount'] = i;
-				localStorage['whiteListCount'] = i;
-				jsonstr = localStorage['blackList'];
-				i = 0;
-				while(jsonstr.length > 0) {
-					segment = jsonstr.substr(0, limit);
-					settingssync["blackList_" + i] = segment;
-					localStorage["blackList_" + i] = segment;
-					jsonstr = jsonstr.substr(limit);
-					i++;
-				}
-				settingssync['blackListCount'] = i;
-				localStorage['blackListCount'] = i;
-				updateSyncTime();
-				chrome.storage.sync.set(settingssync, function() {});
-			}
 		} else if (listtype == 1) {
 			sessionStorage['whiteList'] = JSON.stringify(whiteList);
 			sessionStorage['blackList'] = JSON.stringify(blackList);
@@ -338,6 +311,7 @@ function setDefaultOptions() {
 	defaultOptionValue("version", version);
 	defaultOptionValue("sync", "false");
 	defaultOptionValue("syncenable", "true");
+	defaultOptionValue("syncnotify", "true");
 	defaultOptionValue("updatenotify", "true");
 	defaultOptionValue("enable", "true");
 	defaultOptionValue("mode", "block");
@@ -362,14 +336,13 @@ function setDefaultOptions() {
 	defaultOptionValue("rating", "true");
 	defaultOptionValue("referrer", "true");
 	defaultOptionValue("linktarget", "off");
-	defaultOptionValue("search", "duckduckgo");
 	defaultOptionValue("domainsort", "true");
 	defaultOptionValue("useragentspoof", "off");
 	defaultOptionValue("useragentspoof_os", "off");
 	defaultOptionValue("referrerspoof", "off");
 	defaultOptionValue("cookies", "true");
 	if (!optionExists("blackList")) localStorage['blackList'] = JSON.stringify([]);
-	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com","mail.google.com","youtube.com","s.ytimg.com"]);
+	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com","mail.google.com","youtube.com","s.ytimg.com","maps.gstatic.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);
 	if (typeof sessionStorage['whiteList'] === "undefined") sessionStorage['whiteList'] = JSON.stringify([]);
 	chrome.browserAction.setBadgeBackgroundColor({color:[208, 0, 24, 255]});
@@ -495,6 +468,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	} else if (request.reqtype == 'save') {
 		domainHandler(request.url, 2, 1);
 		domainHandler(request.url, request.list);
+		freshSync(2);
 		changed = true;
 	} else if (request.reqtype == 'temp') {
 		if (typeof request.url == 'object') {
@@ -557,121 +531,162 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	} else
 		sendResponse({});
 });
-
 setDefaultOptions();
-		
-function updateSyncTime() {
-	if (storageapi && localStorage['syncenable'] == 'true') {
+// Debug Synced Items
+chrome.storage.sync.get(null, function(changes) {
+	for (key in changes) {
+		//alert(changes['scriptsafe_settings'].length);
+	}
+});
+function freshSync(mode, force) {
+	if (storageapi) {
+		window.clearTimeout(synctimer);
+		var settingssync = {};
+		var simplesettings = '';
+		if (force) {
+		// mode == 0 = all; 1 = settings only; 2 = whitelist/blacklist
+		//if (mode == 0 || mode == 1) {
+			for (k in localStorage) {
+				if (k != "version" && k != "sync" && k != "scriptsafe_settings" && k != "lastSync" && k != "whiteList" && k != "blackList" && k != "whiteListCount" && k != "blackListCount" && k.substr(0, 2) != "zb" && k.substr(0, 2) != "zw") {
+					simplesettings += k+"|"+localStorage[k]+"~";
+				}
+			}
+			simplesettings = simplesettings.slice(0,-1);
+			settingssync['scriptsafe_settings'] = simplesettings;
+		//}
+		//if (mode == 0 || mode == 2) {
+			var jsonstr = JSON.parse(localStorage['whiteList']).toString();
+			var jsonstrlen = jsonstr.length;
+			var limit = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - Math.ceil(jsonstrlen/(chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 4)) - 4);
+			var i = 0;
+			while(jsonstr.length > 0) {
+				var segment = jsonstr.substr(0, limit);
+				settingssync["zw" + i] = segment;
+				localStorage["zw" + i] = segment;
+				jsonstr = jsonstr.substr(limit);
+				i++;
+			}
+			localStorage['whiteListCount'] = i;
+			settingssync['whiteListCount'] = i;
+			jsonstr = JSON.parse(localStorage['blackList']).toString();
+			jsonstrlen = jsonstr.length;
+			limit = (chrome.storage.sync.QUOTA_BYTES_PER_ITEM - Math.ceil(jsonstrlen/(chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 4)) - 4);
+			i = 0;
+			while(jsonstr.length > 0) {
+				var segment = jsonstr.substr(0, limit);
+				settingssync["zw" + i] = segment;
+				localStorage["zw" + i] = segment;
+				jsonstr = jsonstr.substr(limit);
+				i++;
+			}
+			localStorage['blackListCount'] = i;
+			settingssync['blackListCount'] = i;
+		//}
 		var milliseconds = (new Date).getTime();
 		localStorage['lastSync'] = milliseconds;
-		chrome.storage.sync.set({lastSync: milliseconds}, function() {});
+		settingssync['lastSync'] = milliseconds;
+		chrome.storage.sync.set(settingssync, function() {});
+		if (localStorage['syncnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
+		} else {
+			synctimer = window.setTimeout(function() { syncQueue() }, 30000);
+		}
+		return true;
+	} else {
+		return false;
 	}
 }
-function freshSync() {
-	var settingssync = {};
-	for (k in localStorage) {
-		if (k != "version" && k != "whiteList" && k != "blackList") {
-			settingssync[k] = localStorage[k];
-		}
-	}
-	var jsonstr = localStorage['whiteList'];
-	var i = 0;
-	var limit = chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
-	while(jsonstr.length > 0) {
-		var segment = jsonstr.substr(0, limit);
-		settingssync["whiteList_" + i] = segment;
-		localStorage["whiteList_" + i] = segment;
-		jsonstr = jsonstr.substr(limit);
-		i++;
-	}
-	settingssync['whiteListCount'] = i;
-	localStorage['whiteListCount'] = i;
-	jsonstr = localStorage['blackList'];
-	i = 0;
-	while(jsonstr.length > 0) {
-		segment = jsonstr.substr(0, limit);
-		settingssync["blackList_" + i] = segment;
-		localStorage["blackList_" + i] = segment;
-		jsonstr = jsonstr.substr(limit);
-		i++;
-	}
-	settingssync['blackListCount'] = i;
-	localStorage['blackListCount'] = i;
-	settingssync['sync'] = 'true';
-	localStorage['sync'] = 'true';
-	var milliseconds = (new Date).getTime();
-	settingssync['lastSync'] = milliseconds;
-	localStorage['lastSync'] = milliseconds;
-	chrome.storage.sync.set(settingssync, function() {});
+function syncQueue() {
+	freshSync(0, true);
 }
 if (storageapi) {
 	chrome.storage.onChanged.addListener(function(changes, namespace) {
 		if (namespace == 'sync' && localStorage['syncenable'] == 'true') {
 			if (typeof changes['lastSync'] !== 'undefined') {
-				lastSync = changes['lastSync'].newValue;
-				if (lastSync != localStorage['lastSync']) {
-					for (key in changes) {
-						localStorage[key] = changes[key].newValue;
-					}
-					var concatlist;
-					concatlist = '';
-					for (i = 0; i < localStorage['whiteListCount']; i++) {
-						concatlist += localStorage['whiteList_'+i];
-					}
-					localStorage['whiteList'] = concatlist;
-					concatlist = '';
-					for (i = 0; i < localStorage['blackListCount']; i++) {
-						concatlist += localStorage['blackList_'+i];
-					}
-					localStorage['blackList'] = concatlist;
+				if (changes['lastSync'].newValue != localStorage['lastSync']) {
+					importSync(changes, 1);
 				}
 			}
 		}
 	});
-	if (localStorage['sync'] == 'false' && localStorage['syncenable'] == 'true') { // initialize cloud sync one-time, introduced in v1.0.6.3!
-		chrome.storage.sync.get(null, function(changes) {
-			if (typeof changes['lastSync'] !== 'undefined') {
-				if (confirm("ScriptSafe has detected that you have settings synced for your Google account from another device!\r\nDo you want to import the settings?")) {
-					for (key in changes) {
-						localStorage[key] = changes[key];
-					}
-					var concatlist;
-					concatlist = '';
-					for (i = 0; i < localStorage['whiteListCount']; i++) {
-						concatlist += localStorage['whiteList_'+i];
-					}
-					localStorage['whiteList'] = concatlist;
-					concatlist = '';
-					for (i = 0; i < localStorage['blackListCount']; i++) {
-						concatlist += localStorage['blackList_'+i];
-					}
-					localStorage['blackList'] = concatlist;
-					localStorage['sync'] = 'true';
-				} else {
-					if (confirm("Do you want to enable settings syncing?")) {
+	importSyncHandle(0);
+}
+function importSyncHandle(mode) {
+	if (storageapi) {
+		if (mode == '1' || (localStorage['sync'] == 'false' && localStorage['syncenable'] == 'true' && mode == '0')) { // initialize cloud sync one-time, introduced in v1.0.6.3!
+			chrome.storage.sync.get(null, function(changes) {
+				if (typeof changes['lastSync'] !== 'undefined') {
+					if (mode == '1' || confirm("ScriptSafe has detected that you have settings synced for your Google account from another device!\r\nDo you want to import the settings?")) {
+						importSync(changes, 2);
 						localStorage['sync'] = 'true';
-						localStorage['syncenable'] = 'true';
 					} else {
-						localStorage['syncenable'] = 'false';
+						syncenable();
+					}
+				} else {
+					if (confirm("It appears you haven't synced your settings yet.\r\nScriptSafe is about to sync your current settings to all of your computers/devices.\r\nDo you want to continue?\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
+						syncstatus = freshSync(0, true);
+						localStorage['sync'] = 'true';
+						if (!syncstatus) {
+							alert('Your current version of Google Chrome does not support settings syncing. Please try updating your Chrome version and try again.');
+						}
+					} else {
+						syncenable();
 					}
 				}
-			} else {
-				if (confirm("It appears you haven't synced your settings yet.\r\nScriptSafe is about to sync your current settings to all of your computers/devices.\r\nDo you want to continue?\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
-					freshSync();
-				} else {
-					if (confirm("Do you want to enable settings syncing?")) {
-						localStorage['sync'] = 'true';
-						localStorage['syncenable'] = 'true';
-					} else {
-						localStorage['syncenable'] = 'false';
-					}
-				}
-			}
-		});
+			});
+		}
+	} else {
+		alert('Your current version of Google Chrome does not support settings syncing. Please try updating your Chrome version and try again.');
 	}
 }
-
+function importSync(changes, mode) {
+	oldLastSync = localStorage['lastSync'];
+	for (key in changes) {
+		if (key != 'scriptsafe_settings') {
+			if (mode == '1') localStorage[key] = changes[key].newValue;
+			else if (mode == '2') localStorage[key] = changes[key];
+		} else if (key == 'scriptsafe_settings') {
+			if (mode == '1') var settings = changes[key].newValue.split("~");
+			else if (mode == '2') var settings = changes[key].split("~");
+			if (settings.length > 0) {
+				$.each(settings, function(i, v) {
+					if ($.trim(v) != "") {
+						settingentry = $.trim(v).split("|");
+						if ($.trim(settingentry[1]) != '') {
+							localStorage[$.trim(settingentry[0])] = $.trim(settingentry[1]);
+						}
+					}
+				});
+			}
+		}
+	}
+	newLastSync = localStorage['lastSync'];
+	if (oldLastSync != newLastSync) {
+		var concatlist;
+		concatlist = '';
+		for (i = 0; i < localStorage['whiteListCount']; i++) {
+			concatlist += localStorage['zw'+i];
+		}
+		localStorage['whiteList'] = JSON.stringify(concatlist.split(","));
+		concatlist = '';
+		for (i = 0; i < localStorage['blackListCount']; i++) {
+			concatlist += localStorage['zb'+i];
+		}
+		localStorage['blackList'] = JSON.stringify(concatlist.split(","));
+	}
+}
+function syncenable() {
+	if (confirm("Do you want to enable settings syncing?")) {
+		localStorage['syncenable'] = 'true';
+	} else {
+		localStorage['syncenable'] = 'false';
+	}
+}
 if (!optionExists("version") || localStorage["version"] != version) {
+	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
+	if (version == '1.0.6.4' && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
+		chrome.storage.sync.clear();
+		if (localStorage['sync'] == 'true' && localStorage['syncenable'] == 'true') freshSync(0, true);	
+	}
 	localStorage["version"] = version;
 	if (localStorage["updatenotify"] == "true") {
 		chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });

@@ -22,7 +22,7 @@
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr><td colspan="2" class="section">General Settings</td></tr>
 				<tr><td class="rowtitle"><label for="enable">Enable</label>:</td><td><input type="checkbox" id="enable" class="save" /> <i>(Default: enabled)</i></td></tr>
-				<tr><td class="rowtitle"><label for="syncenable">Enable Syncing</label>:</td><td><input type="checkbox" id="syncenable" class="save" /> <i>(Default: enabled)</i></td></tr>
+				<tr><td class="rowtitle"><label for="syncenable">Enable Syncing</label>:</td><td><input type="checkbox" id="syncenable" class="save" /> <i>(Default: enabled)</i><br /><input type="button" id="syncimport" value="Sync Settings FROM Google Account" /> <input type="button" id="syncexport" value="Sync Settings TO Google Account" /></td></tr>
 				<tr><td class="rowtitle"><label for="mode">Default Mode</label>:</td><td><select id="mode" class="savechange">
 					<option value="block">Block (recommended)</option>
 					<option value="allow">Allow</option>
@@ -40,6 +40,7 @@
 					<input type="checkbox" id="image" class="save" /><label for="image"> &lt;IMG&gt;</label>
 				</td></tr>
 				<tr><td class="rowtitle"><label for="xml">Forbid Cross-Domain XML</label>:</td><td><input type="checkbox" id="xml" class="save" /> <i>(Default: enabled; blocks cross-domain XML HTTP Requests from being made)</i></td></tr>
+				<tr><td class="rowtitle"><label for="syncnotify">Show Sync Notification Popup</label>:</td><td><input type="checkbox" id="syncnotify" class="save" /> <i>(Default: enabled; show popup when settings synced to your Google Account)</i></td></tr>
 				<tr><td class="rowtitle"><label for="updatenotify">Show Update Popup</label>:</td><td><input type="checkbox" id="updatenotify" class="save" /> <i>(Default: enabled; show popup page when ScriptSafe is updated)</i></td></tr>
 				<tr><td colspan="2" class="section">Privacy Settings</td></tr>
 				<tr><td class="rowtitle"><label for="annoyances">Block Unwanted Content</label>:</td><td><input type="checkbox" id="annoyances" class="save" /> <i>(Default: enabled; remove unwanted content from known ad / malware domains; domains gathered from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</i></td></tr>
@@ -87,11 +88,6 @@
 					<option value="domain">Same Domain</option>
 					<option value="custom">Custom</option>
 				</select><br /><i>(Default: -Off-; <b>warning</b>: if enabled, may "break" some sites (e.g. logging in))</i><div id="customreferrer" class="hide"><input id="userref" value="" /> <input type="button" class="save" value="Save" /></div></td></tr>
-				<!-- <tr><td class="rowtitle"><label for="search">Default SN Search Engine</label>:</td><td><select id="search" class="savechange">
-					<option value="duckduckgo">DuckDuckGo SSL</option>
-					<option value="google">Google SSL</option>
-					<option value="scroogle">Scroogle SSL</option>
-				</select> <i>(Default: DuckDuckGo SSL; access by typing "s" in the address bar, pressing space, and typing your query)</i></td></tr> -->
 				<tr><td colspan="2" class="section">Behavior Settings</td></tr>
 				<tr><td class="rowtitle"><label for="linktarget">Page Link Opening Behaviour</label>:</td><td><select id="linktarget" class="savechange">
 					<option value="off">-Unchanged-</option>

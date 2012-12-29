@@ -1,35 +1,49 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>ScriptSafe Updated</title>
+<title>ScriptSafe Updated!</title>
 <link rel="stylesheet" href="../css/options.css" type="text/css" media="screen" />
 <script type="text/javascript" src="../js/jquery.js"></script>
 </head>
 <body>
 	<div id="message"></div> 
 	<div id="main">
-	<h1>Updated to v<span id="versionno"></span>! (Thursday, December 27, 2012)</h1>
+	<h1>Updated to v<span id="versionno"></span>! (Saturday, December 29, 2012)</h1>
 	<div style="text-align: left; line-height: 18px; font-size: 13px;"><br />
-	I've been very busy with life, my sincere apologies for not being able to respond to questions. I've finally gotten around to updating ScriptSafe (formerly known as ScriptNo), building in a feature that many of you have been requesting: cross-device settings syncing! I hope to spend time fixing reported bugs, some of which may have been fixed with Chrome's API updates and/or the update to Manifest version 2 in this release.
+	<b>Saturday, December 29, 2012 @ 4:20am</b> (yes, I've been up working on this!): I've spent most of the day today fleshing out the auto-syncing capabilities in ScriptSafe (formerly known as ScriptNo), making it even more intuitive, robust, and reliable. I'm also placing bug reports on my peripheral, fixing a couple that were reported to me yesterday and today.
+	<br /><br />
+	I hope to focus on squishing more bugs in the next few releases, when I get more time to do so over this holiday.<br /><b>Do you like my work? Click the green heart ;)</b>
 	<br /><br />
 	<b>Happy Holidays to you and your loved ones, and may you have a prosperous year filled with happiness!</b><br /><br />
 	Without further ado, here are the additions/changes to ScriptSafe in this release:
 	<ul>
-		<li><b>v1.0.6.3: renamed to "ScriptSafe" from "ScriptNo"</b></li>
-		<li>New Features:<ul>
-			<li>Cross-Device Settings Syncing - ScriptSafe now automatically syncs your settings across all of your devices (if enabled of course!) (Default: Enabled)</li>
-			</ul>
-		</li>
-		<li>Updates:<ul>
-			<li>Code rewritten to use the new Manifest version 2 standards enforced by Google</li>
-			<li>Unwanted content domains list updated (domains compiled and optimized from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</li>
-			<li>Default whitelisting of Gmail and YouTube for new installations only (to be less disruptive for new users)</li>
-			</ul>
-		</li>
+		<li><b>v1.0.6.4:</b><ul>
+			<li>Implemented <a href="https://code.google.com/p/scriptno/issues/detail?id=129" target="_blank">webbugs patch from martin.b</a></li>
+			<li>Fixed issue where the close button in the ScriptSafe details popup won't close the popup</li>
+			<li>Streamlined syncing to take up significantly less nodes</li>
+			<li>Improved support for the syncing of very large blacklists/whitelists</li>
+			<li>Added a notification pop-up that will appear in the bottom-right corner of your screen when your settings have been successfully synced (you can disable this in the Options page)<ul><li>Note: this WILL NOT show when settings have been synced FROM your Google Account, only TO, to prevent headaches ;)</li></ul></li>
+			<li>Added the ability to force Settings Syncing TO and FROM your current device in the Options page</li>
+			<li>Auto-syncing will occur 30 seconds after the last settings/whitelist/blacklist update in order to ensure compliance with the rate limits Google has set (10 per minute and 1,000 per hour)</li>
+			<li>Added <b>maps.gstatic.com</b> to the default whitelist for new users for Google Maps Streetview support (if you're an existing user, feel free to add this to your whitelist; it's not in my intention to forcefully whitelist things for you!)</li>
+		</ul></li>
+		<li><b>v1.0.6.3: renamed to "ScriptSafe" from "ScriptNo"</b><ul>
+			<li>New Features:<ul>
+				<li>Cross-Device Settings Syncing - ScriptSafe now automatically syncs your settings across all of your devices (if enabled of course!) (Default: Enabled)</li>
+				</ul>
+			</li>
+			<li>Updates:<ul>
+				<li>Code rewritten to use the new Manifest version 2 standards enforced by Google</li>
+				<li>Unwanted content domains list updated (domains compiled and optimized from <a href="http://winhelp2002.mvps.org/hosts.htm" target="_blank">MVPS HOSTS</a>, <a href="http://hosts-file.net" target="_blank">hpHOSTS (ad / tracking servers)</a>, <a href="http://pgl.yoyo.org/as/policy.php" target="_blank">Peter Lowe's HOSTS Project</a>, <a href="http://www.malwaredomainlist.com/" target="_blank">MalwareDomainList.com</a>, and <a href="http://mirror1.malwaredomains.com/files/immortal_domains.txt" target="_blank">DNS-BH – Malware Domain Blocklist</a>)</li>
+				<li>Default whitelisting of Gmail and YouTube for new installations only (to be less disruptive for new users)</li>
+				</ul>
+			</li>
+		</ul></li>
 	</ul>
 	My goals for the future:
 	<ul>
 		<li>Language translations</li>
+		<li>Interface redesign</li>
 		<li>Fixing as many reported issues as possible</li>
 	</ul>
 	Thank you, and enjoy.	
