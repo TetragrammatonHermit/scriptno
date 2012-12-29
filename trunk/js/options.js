@@ -17,7 +17,21 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#settingsall").click(settingsall);
 	$(".savechange").change(saveOptions);
 	$(".close").click(closeOptions);
+	$("#syncimport").click(forceSyncImport);
+	$("#syncexport").click(forceSyncExport);
 });
+function forceSyncExport() {
+	if(confirm('Do you want to sync your current settings to your Google Account?\r\nNote: please do not press this frequently; there is a limit of 10 per minute and 1,000 per hour.')) {
+		bkg.freshSync(0, true);
+		notification('Settings successfully synced to your Google Account');
+	}
+}
+function forceSyncImport() {
+	if(confirm('Do you want to import the synced settings from your Google Account to this device?')) {
+		bkg.importSyncHandle(1);
+		notification('Settings successfully synced from your Google Account to this device');
+	}
+}
 function importbulkwhite() {
 	importbulk(0);
 }
@@ -83,6 +97,7 @@ function loadOptions() {
 	loadCheckbox("enable");
 	loadCheckbox("syncenable");
 	loadCheckbox("updatenotify");
+	loadCheckbox("syncnotify");
 	loadElement("mode");
 	loadCheckbox("refresh");
 	loadCheckbox("script");
@@ -119,6 +134,7 @@ function loadOptions() {
 function saveOptions() {
 	saveCheckbox("enable");
 	saveCheckbox("syncenable");
+	saveCheckbox("syncnotify");
 	saveCheckbox("updatenotify");
 	saveElement("mode");
 	saveCheckbox("refresh");
@@ -162,8 +178,12 @@ function saveOptions() {
 	else $("#useragentspoof_os").hide();
 	updateExport();
 	bkg.refreshRequestTypes();
-	bkg.freshSync();
-	notification('Settings saved');
+	syncstatus = bkg.freshSync(1);
+	if (syncstatus) {
+		notification('Settings saved and syncing in 30 seconds');
+	} else {
+		notification('Settings saved');
+	}
 }
 function selectAll(id) {
 	$("#"+id).select();
@@ -179,15 +199,15 @@ function settingsImport() {
 		$.each(settings, function(i, v) {
 			if ($.trim(v) != "") {
 				settingentry = $.trim(v).split("|");
-				if (settingnames.indexOf($.trim(settingentry[0]).toLowerCase()) != -1 && $.trim(settingentry[1]) != '') {
-					if ($.trim(settingentry[0]).toLowerCase() == 'whitelist' || $.trim(settingentry[0]).toLowerCase() == 'blacklist') {
+				if (settingnames.indexOf($.trim(settingentry[0])) != -1 && $.trim(settingentry[1]) != '') {
+					if ($.trim(settingentry[0]) == 'whiteList' || $.trim(settingentry[0]) == 'blackList') {
 						listarray = $.trim(settingentry[1]).replace(/(\[|\]|")/g,"").split(",");
-						if ($.trim(settingentry[0]).toLowerCase() == 'whitelist' && listarray.toString() != '') localStorage['whiteList'] = JSON.stringify(listarray);
-						else if ($.trim(settingentry[0]).toLowerCase() == 'blacklist' && listarray.toString() != '') localStorage['blackList'] = JSON.stringify(listarray);
+						if ($.trim(settingentry[0]) == 'whiteList' && listarray.toString() != '') localStorage['whiteList'] = JSON.stringify(listarray);
+						else if ($.trim(settingentry[0]) == 'blackList' && listarray.toString() != '') localStorage['blackList'] = JSON.stringify(listarray);
 					} else 
-						localStorage[$.trim(settingentry[0]).toLowerCase()] = $.trim(settingentry[1]);
+						localStorage[$.trim(settingentry[0])] = $.trim(settingentry[1]);
 				} else {
-					error += $.trim(settingentry[0]).toLowerCase()+", ";
+					error += $.trim(settingentry[0])+", ";
 				}
 			}
 		});
@@ -195,17 +215,23 @@ function settingsImport() {
 	loadOptions();
 	listUpdate();
 	if (!error) {
-		notification('Settings imported successfully');
+		syncstatus = bkg.freshSync(0);
+		if (syncstatus) {
+			notification('Settings imported successfully and syncing in 30 seconds');
+		} else {
+			notification('Settings imported successfully');
+		}
 		$("#settingsimport").val("");
 	} else {
+		bkg.freshSync(0);
 		notification('Error importing the following settings (empty value and/or invalid setting name): '+error.slice(0, -2));
 	}
 }
 function updateExport() {
 	$("#settingsexport").val("");
 	for (i in localStorage) {
-		if (i != "version") {
-			settingnames.push(i.toLowerCase());
+		if (i != "version" && i != "whiteListCount" && i != "blackListCount" && i.substr(0, 2) != "zb" && i.substr(0, 2) != "zw") {
+			settingnames.push(i);
 			$("#settingsexport").val($("#settingsexport").val()+i+"|"+localStorage[i]+"\n");
 		}
 	}
@@ -231,7 +257,13 @@ function addList(type) {
 			responseflag = bkg.domainHandler(domain, type);
 			if (responseflag) {
 				$('#url').val('');
-				notification(['Whitelisted','Blacklisted'][type]+' '+domain+'.');
+				syncstatus = bkg.freshSync(2);
+				if (syncstatus) {
+					notification(['Whitelisted','Blacklisted'][type]+' '+domain+' and syncing in 30 seconds.');
+				} else {
+					notification(['Whitelisted','Blacklisted'][type]+' '+domain+'.');
+				}
+				notification();
 				listUpdate();
 			} else {
 				notification(domain+' not added as it already exists in the list or the entire domain has been '+['whitelisted','blacklisted'][type]);
@@ -246,6 +278,12 @@ function domainRemover(domain) {
 		bkg.domainHandler(domain,2);
 		listUpdate();
 		notification('Successfully removed: '+domain);
+		syncstatus = bkg.freshSync(2);
+		if (syncstatus) {
+			notification('Successfully removed: '+domain+' and syncing in 30 seconds.');
+		} else {
+			notification('Successfully removed: '+domain);
+		}
 	}
 	return false;
 }
@@ -255,6 +293,7 @@ function topDomainAdd(domain, mode) {
 	if (domain && !domain.match(/^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/g) && domain[0] != '*' && domain[1] != '.' && confirm("Are you sure you want to "+lingo+" "+bkg.getDomain(domain)+"?\r\n\r\Click OK will mean all subdomains on "+bkg.getDomain(domain)+" will be "+lingo+"ed, such as _."+bkg.getDomain(domain)+" and even _._._."+bkg.getDomain(domain)+".")) {
 		result = bkg.topHandler(domain, mode);
 		listUpdate();
+		bkg.freshSync(2);
 		notification('Successfully '+lingo+'ed: '+domain);
 	}
 }
@@ -299,11 +338,17 @@ function importbulk(type) {
 	}
 	listUpdate();
 	if (!error) {
-		notification('Domains imported successfully');
+		syncstatus = bkg.freshSync(2);
+		if (syncstatus) {
+			notification('Domains imported successfully and syncing in 30 seconds');
+		} else {
+			notification('Domains imported successfully');
+		}
 		if ($("#bulk").is(":visible")) hidebulk();
 		$("#bulk textarea").val("");
 		$('#importerror').hide();
 	} else {
+		bkg.freshSync(2);
 		notification('Error importing some domains');
 		$('#importerror').html('<br /><strong>Some Domains Not Imported</strong><br />The following domains were not imported as they are invalid (the others were successfully imported): <ul>'+error+'</ul>').stop().fadeIn("slow");
 	}
@@ -339,7 +384,12 @@ function listclear(type) {
 	if (confirm(['Clear whitelist?','Clear blacklist?'][type])) {
 		localStorage[['whiteList','blackList'][type]] = JSON.stringify([]);
 		listUpdate();
-		notification('Settings saved');
+		syncstatus = bkg.freshSync(2);
+		if (syncstatus) {
+			notification('Settings saved and syncing in 30 seconds');
+		} else {
+			notification('Settings saved');
+		}
 	}
 	return false;
 }

@@ -22,8 +22,8 @@
    "minimum_chrome_version": "6",
    "name": "ScriptSafe",
    "options_page": "html/options.html",
-   "permissions": [ "http://*/*", "https://*/*", "tabs", "unlimitedStorage", "webRequest", "webRequestBlocking", "contentSettings", "storage" ],
+   "permissions": [ "http://*/*", "https://*/*", "tabs", "unlimitedStorage", "webRequest", "webRequestBlocking", "contentSettings", "storage", "notifications" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.0.6.3",
+   "version": "1.0.6.4",
    "manifest_version": 2
 }
