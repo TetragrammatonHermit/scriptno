@@ -533,11 +533,13 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 });
 setDefaultOptions();
 // Debug Synced Items
+/*
 chrome.storage.sync.get(null, function(changes) {
 	for (key in changes) {
-		//alert(changes['scriptsafe_settings'].length);
+		alert(changes['whiteList'].length);
 	}
 });
+*/
 function freshSync(mode, force) {
 	if (storageapi) {
 		window.clearTimeout(synctimer);
@@ -615,14 +617,14 @@ function importSyncHandle(mode) {
 		if (mode == '1' || (localStorage['sync'] == 'false' && localStorage['syncenable'] == 'true' && mode == '0')) { // initialize cloud sync one-time, introduced in v1.0.6.3!
 			chrome.storage.sync.get(null, function(changes) {
 				if (typeof changes['lastSync'] !== 'undefined') {
-					if (mode == '1' || confirm("ScriptSafe has detected that you have settings synced for your Google account from another device!\r\nDo you want to import the settings?")) {
+					if (mode == '1' || confirm("ScriptSafe has detected that you have settings synced for your Google account from another device!\r\n\r\nDo you want to import the settings?")) {
 						importSync(changes, 2);
 						localStorage['sync'] = 'true';
 					} else {
 						syncenable();
 					}
 				} else {
-					if (confirm("It appears you haven't synced your settings yet.\r\nScriptSafe is about to sync your current settings to all of your computers/devices.\r\nDo you want to continue?\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
+					if (confirm("It appears you haven't synced your settings yet.\r\n\r\nScriptSafe is about to sync your current settings to all of your computers/devices.\r\n\r\nDo you want to continue?\r\n\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
 						syncstatus = freshSync(0, true);
 						localStorage['sync'] = 'true';
 						if (!syncstatus) {
@@ -660,6 +662,9 @@ function importSync(changes, mode) {
 		}
 	}
 	newLastSync = localStorage['lastSync'];
+	listsSync(mode, oldLastSync, newLastSync);
+}
+function listsSync(mode, oldLastSync, newLastSync) {
 	if (mode == '2' || oldLastSync != newLastSync) {
 		var concatlist;
 		concatlist = '';
@@ -676,6 +681,36 @@ function importSync(changes, mode) {
 		concatlistarr = concatlist.split(",");
 		if (concatlist == '' || concatlistarr.length == 0) localStorage['blackList'] = JSON.stringify([]);
 		else localStorage['blackList'] = JSON.stringify(concatlistarr);
+	} else if (mode == '3' || mode == '4') {
+		if (localStorage["whiteList_0"] || localStorage["whiteList_0"]) {
+			if(confirm('My sincere apologies if your whitelists/blacklists were seemingly wiped out! I\'ve put together a fix.\r\n\r\nPlease press OK to restore your lists.\r\n\r\nAfterwards, please make a backup and proceed to sync your settings to your Google Account from the Options page that will open once you\'re ready.')) {
+				var concatlist;
+				concatlist = '';
+				for (i = 0; i < 5; i++) {
+					if (localStorage['whiteList_'+i]) concatlist += localStorage['whiteList_'+i];
+				}
+				if (mode == '3') {
+					concatlistarr = concatlist.split(",");
+					if (concatlist == '' || concatlistarr.length == 0) localStorage['whiteList'] = JSON.stringify([]);
+					else localStorage['whiteList'] = JSON.stringify(concatlistarr);
+				} else if (mode == '4') {
+					localStorage['whiteList'] = concatlistarr;
+				}
+				concatlist = '';
+				for (i = 0; i < 5; i++) {
+					if (localStorage['blackList_'+i]) concatlist += localStorage['blackList_'+i];
+				}
+				if (mode == '3') {
+					concatlistarr = concatlist.split(",");
+					if (concatlist == '' || concatlistarr.length == 0) localStorage['blackList'] = JSON.stringify([]);
+					else localStorage['blackList'] = JSON.stringify(concatlistarr);
+				} else if (mode == '4') {
+					localStorage['blackList'] = concatlistarr;
+				}
+				alert('Successfully restored your settings!\r\n\r\nThe Options page will now open where you can review your whitelist/blacklist and choose to sync them to your Google Account (and/or sync from your Google Account)');
+				chrome.tabs.create({url: chrome.extension.getURL('html/options.html')});
+			}
+		}
 	}
 }
 function syncenable() {
@@ -687,9 +722,15 @@ function syncenable() {
 }
 if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
-	if (version == '1.0.6.5' && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
+	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
 		chrome.storage.sync.clear();
-		if (localStorage['sync'] == 'true' && localStorage['syncenable'] == 'true') freshSync(0, true);	
+		if (localStorage['sync'] == 'true' && localStorage['syncenable'] == 'true') {
+			if (version == '1.0.6.3') {
+				listsSync(4, false, false);
+			} else {
+				listsSync(3, false, false);
+			}
+		}
 	}
 	localStorage["version"] = version;
 	if (localStorage["updatenotify"] == "true") {
