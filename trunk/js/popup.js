@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#pop_quick").click(function() { openTab('http://andryou.com/2011/08/21/scriptno-a-quick-guide/'); });
 	$("#pop_overview").click(function() { openTab('http://andryou.com/2011/08/14/scriptno/'); });
 	$("#pop_project").click(function() { openTab('http://code.google.com/p/scriptno/'); });
-	$("#pop_faq").click(function() { openTab('http://code.google.com/p/ScriptSafe/wiki/FrequentlyAskedQuestions'); });
+	$("#pop_faq").click(function() { openTab('http://code.google.com/p/scriptno/wiki/FrequentlyAskedQuestions'); });
 	$("#pop_options").click(function() { openTab(chrome.extension.getURL('html/options.html')); });
 	$("#pop_webstore").click(function() { openTab('https://chrome.google.com/webstore/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf'); });
-	$(".closebtn").click(function() { window.close(); });
+	$("#pop_close").click(function() { window.close(); });
 });
 var version = (function () {
 		var xhr = new XMLHttpRequest();
