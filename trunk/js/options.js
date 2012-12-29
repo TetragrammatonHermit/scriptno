@@ -230,7 +230,7 @@ function settingsImport() {
 function updateExport() {
 	$("#settingsexport").val("");
 	for (i in localStorage) {
-		if (i != "version" && i != "whiteListCount" && i != "blackListCount" && i.substr(0, 10) != "whiteList_" && i.substr(0, 10) != "blackList_" && i.substr(0, 2) != "zb" && i.substr(0, 2) != "zw") {
+		if (i != "version" && i != "whiteListCount" && i != "blackListCount" && i.substr(0, 2) != "zb" && i.substr(0, 2) != "zw") {
 			settingnames.push(i);
 			$("#settingsexport").val($("#settingsexport").val()+i+"|"+localStorage[i]+"\n");
 		}
