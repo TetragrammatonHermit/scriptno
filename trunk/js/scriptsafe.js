@@ -660,18 +660,22 @@ function importSync(changes, mode) {
 		}
 	}
 	newLastSync = localStorage['lastSync'];
-	if (oldLastSync != newLastSync) {
+	if (mode == '2' || oldLastSync != newLastSync) {
 		var concatlist;
 		concatlist = '';
 		for (i = 0; i < localStorage['whiteListCount']; i++) {
 			concatlist += localStorage['zw'+i];
 		}
-		localStorage['whiteList'] = JSON.stringify(concatlist.split(","));
+		concatlistarr = concatlist.split(",");
+		if (concatlist == '' || concatlistarr.length == 0) localStorage['whiteList'] = JSON.stringify([]);
+		else localStorage['whiteList'] = JSON.stringify(concatlistarr);
 		concatlist = '';
 		for (i = 0; i < localStorage['blackListCount']; i++) {
 			concatlist += localStorage['zb'+i];
 		}
-		localStorage['blackList'] = JSON.stringify(concatlist.split(","));
+		concatlistarr = concatlist.split(",");
+		if (concatlist == '' || concatlistarr.length == 0) localStorage['blackList'] = JSON.stringify([]);
+		else localStorage['blackList'] = JSON.stringify(concatlistarr);
 	}
 }
 function syncenable() {
@@ -683,7 +687,7 @@ function syncenable() {
 }
 if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
-	if (version == '1.0.6.4' && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
+	if (version == '1.0.6.5' && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
 		chrome.storage.sync.clear();
 		if (localStorage['sync'] == 'true' && localStorage['syncenable'] == 'true') freshSync(0, true);	
 	}
