@@ -312,6 +312,7 @@ function setDefaultOptions() {
 	defaultOptionValue("sync", "false");
 	defaultOptionValue("syncenable", "true");
 	defaultOptionValue("syncnotify", "true");
+	defaultOptionValue("syncfromnotify", "true");
 	defaultOptionValue("updatenotify", "true");
 	defaultOptionValue("enable", "true");
 	defaultOptionValue("mode", "block");
@@ -576,19 +577,26 @@ function freshSync(mode, force) {
 			i = 0;
 			while(jsonstr.length > 0) {
 				var segment = jsonstr.substr(0, limit);
-				settingssync["zw" + i] = segment;
-				localStorage["zw" + i] = segment;
+				settingssync["zb" + i] = segment;
+				localStorage["zb" + i] = segment;
 				jsonstr = jsonstr.substr(limit);
 				i++;
 			}
 			localStorage['blackListCount'] = i;
 			settingssync['blackListCount'] = i;
 		//}
-		var milliseconds = (new Date).getTime();
-		localStorage['lastSync'] = milliseconds;
-		settingssync['lastSync'] = milliseconds;
-		chrome.storage.sync.set(settingssync, function() {});
-		if (localStorage['syncnotify'] == 'true' && localStorage['syncenable'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
+			if (localStorage['syncnotify'] == 'true' && localStorage['syncenable'] == 'true') {
+				var milliseconds = (new Date).getTime();
+				localStorage['lastSync'] = milliseconds;
+				settingssync['lastSync'] = milliseconds;
+				chrome.storage.sync.set(settingssync, function() {
+					if (chrome.extension.lastError){
+						alert(chrome.extension.lastError.message);
+					} else {
+						webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
+					}
+				});
+			}
 		} else {
 			synctimer = window.setTimeout(function() { syncQueue() }, 30000);
 		}
@@ -606,6 +614,7 @@ if (storageapi) {
 			if (typeof changes['lastSync'] !== 'undefined') {
 				if (changes['lastSync'].newValue != localStorage['lastSync']) {
 					importSync(changes, 1);
+					if (localStorage['syncfromnotify']) webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncfromnotification.html')).show();
 				}
 			}
 		}
@@ -614,9 +623,9 @@ if (storageapi) {
 }
 function importSyncHandle(mode) {
 	if (storageapi) {
-		if (mode == '1' || (localStorage['sync'] == 'false' && localStorage['syncenable'] == 'true' && mode == '0')) { // initialize cloud sync one-time, introduced in v1.0.6.3!
+		if (mode == '1' || (localStorage['sync'] == 'false' && localStorage['syncenable'] == 'true' && mode == '0')) {
 			chrome.storage.sync.get(null, function(changes) {
-				if (typeof changes['lastSync'] !== 'undefined') {
+				if (typeof changes['lastSync'] !== 'undefined' && typeof changes['scriptsafe_settings'] !== 'undefined' && (typeof changes['zw0'] !== 'undefined' || typeof changes['zb0'] !== 'undefined')) {
 					if (mode == '1' || confirm("ScriptSafe has detected that you have settings synced for your Google account from another device!\r\n\r\nDo you want to import the settings?")) {
 						importSync(changes, 2);
 						localStorage['sync'] = 'true';
@@ -624,7 +633,7 @@ function importSyncHandle(mode) {
 						syncenable();
 					}
 				} else {
-					if (confirm("It appears you haven't synced your settings yet.\r\n\r\nScriptSafe is about to sync your current settings to all of your computers/devices.\r\n\r\nDo you want to continue?\r\n\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
+					if (confirm("It appears you haven't synced your settings yet.\r\n\r\nScriptSafe is about to sync your current settings to your Google account.\r\n\r\nDo you want to continue?\r\n\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
 						syncstatus = freshSync(0, true);
 						localStorage['sync'] = 'true';
 						if (!syncstatus) {
@@ -641,7 +650,6 @@ function importSyncHandle(mode) {
 	}
 }
 function importSync(changes, mode) {
-	oldLastSync = localStorage['lastSync'];
 	for (key in changes) {
 		if (key != 'scriptsafe_settings') {
 			if (mode == '1') localStorage[key] = changes[key].newValue;
@@ -661,11 +669,10 @@ function importSync(changes, mode) {
 			}
 		}
 	}
-	newLastSync = localStorage['lastSync'];
-	listsSync(mode, oldLastSync, newLastSync);
+	listsSync(mode);
 }
-function listsSync(mode, oldLastSync, newLastSync) {
-	if (mode == '2' || oldLastSync != newLastSync) {
+function listsSync(mode) {
+	if (mode == '1' || mode == '2') {
 		var concatlist;
 		concatlist = '';
 		for (i = 0; i < localStorage['whiteListCount']; i++) {
@@ -733,10 +740,10 @@ if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("blackList_2")) delete localStorage['blackList_2'];
 	if (optionExists("blackList_2")) delete localStorage['blackList_3'];
 	*/
-	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6' || version == '1.0.6.7' || version == '1.0.6.8') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
+	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6' || version == '1.0.6.7' || version == '1.0.6.8' || version == '1.0.6.9') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
 		chrome.storage.sync.clear();
 		if (localStorage['sync'] == 'true') {
-			listsSync(3, false, false);
+			listsSync(3);
 		}
 	}
 	localStorage["version"] = version;
