@@ -96,6 +96,7 @@ function loadOptions() {
 	else $("#useragentspoof_os").hide();
 	loadCheckbox("enable");
 	loadCheckbox("syncenable");
+	loadCheckbox("syncfromnotify");
 	loadCheckbox("updatenotify");
 	loadCheckbox("syncnotify");
 	loadElement("mode");
@@ -135,6 +136,7 @@ function saveOptions() {
 	saveCheckbox("enable");
 	saveCheckbox("syncenable");
 	saveCheckbox("syncnotify");
+	saveCheckbox("syncfromnotify");
 	saveCheckbox("updatenotify");
 	saveElement("mode");
 	saveCheckbox("refresh");
@@ -263,7 +265,6 @@ function addList(type) {
 				} else {
 					notification(['Whitelisted','Blacklisted'][type]+' '+domain+'.');
 				}
-				notification();
 				listUpdate();
 			} else {
 				notification(domain+' not added as it already exists in the list or the entire domain has been '+['whitelisted','blacklisted'][type]);
@@ -277,7 +278,6 @@ function domainRemover(domain) {
 	if(confirm("Are you sure you want to remove "+domain+" from this list?")) {
 		bkg.domainHandler(domain,2);
 		listUpdate();
-		notification('Successfully removed: '+domain);
 		syncstatus = bkg.freshSync(2);
 		if (syncstatus) {
 			notification('Successfully removed: '+domain+' and syncing in 30 seconds.');
