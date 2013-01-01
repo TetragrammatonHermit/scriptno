@@ -57,17 +57,13 @@ To use the latter list, ensure "Block Unwanted Content" is ticked.
 
 This approach (two lists) gives you flexibility, security and choice.
 
+== 7. The owner of this website (www.__________.com) has banned your access based on your browser's signature ==
+
+Go into your Options page and set Referrer Spoof to "Off".
+
 == I love this extension! How do I convey this love to you? ==
 
 Thank you! I’ve put many hours into this extension to get it to this level (of course, user feedback has been helpful and important in the progress of ScriptNo). Some ways you can help ScriptNo and I out are:
   * Translation help: one of my long-term goals is to have every ScriptNo user comfortable using it, and this means being able to use it in their own language. If you are bilingual (English + another language) and are willing to help translate the sentences in ScriptNo, contact me: andryou@gmail.com
   * Donations: donations are definitely welcome, but I’m personally against me aggressively soliciting them as I firmly believe it is your choice to donate or not. Whether you do is up to you, you’ll never see any nag messages in ScriptNo about doing so. You’ll just see the clickable heart icons in the ScriptNo Options page 
   * Writing: you can email me, post on the Chrome extension [https://chrome.google.com/webstore/detail/oiigbmnaadbkfbmpbfijlflahbdbdgdf wall] and rate it, and/or tweet/share/post about ScriptNo to your friends!
-
-== You’re so mysterious. Who are you? ==
-
-I’m a recent honors graduate from a business technology program from a university in Toronto, Canada, graduating with over 20 months of full-time work experience due to my co-op terms with world-class organizations such as CIBC and Canada Pension Plan Investment Board (I’m into memes, Reddit, music, spending time with friends, while at the same time making a difference on the web and in the world).
-
-I love Google’s products (a given seeing how this is a Chrome extension), and actually applied for a position at Google Canada (Toronto) (on May 12, 2011), but I’ve had no response.
-
-I’ve created other Chrome extensions as well (all quite popular and highly-rated, such as [https://chrome.google.com/webstore/detail/nlbpiflhmdcklcbihngeffpmoklbiooj Decreased Productivity]); you can check them out under the “More from andryou” box on the ScriptNo page on the Chrome Extension Gallery.
