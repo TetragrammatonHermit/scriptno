@@ -11,6 +11,8 @@ whitelist:
 passport.baidu.com
 deviantart.com
 go.th
+rottentomatoes.com
+andr.net
 //
 addthis.com
 addthiscdn.com
@@ -42,6 +44,10 @@ twitthis.com
 wibiya.com
 widgets.dzone.com
 //
+blacklist:
+googletagservices.com
+googletagmanager.com
+//
 skimresources.com
 preferences.truste.com
 seal.verisign.com
@@ -63,6 +69,7 @@ var antisocial1 = [
 'linkwithin.com',
 'mysocialbuttons.com',
 'niftybuttons.com',
+'po.st',
 'sharethis.com',
 'social-bookmark-script.de',
 'sociallist.org',
@@ -73,16 +80,24 @@ var antisocial1 = [
 'twitterbuttons.com',
 'twittercounter.com',
 'twitthis.com',
+'userapi.com',
 'wibiya.com'
 ];
 
 var antisocial2 = [
+'api.twitter.com',
+'assets.pinterest.com',
+'cdn.api.twitter.com',
 'connect.facebook.com',
 'connect.facebook.net',
 'platform.linkedin.com',
+'platform.tumblr.com',
 'platform.twitter.com',
 'platform0.twitter.com',
+'plusone.google.com',
+'s.meebocdn.net',
 'widget.break.com',
+'widget.meebo.com',
 'widgets.digg.com',
 'widgets.dzone.com',
 'widgets.twimg.com'
@@ -1086,7 +1101,6 @@ var yoyo1 = [
 'anandpower.com',
 'anchorfreesearch.com',
 'ancom1.ru',
-'andr.net',
 'andressolimano.com',
 'andyhoppe.com',
 'andysgame.com',
@@ -3477,6 +3491,8 @@ var yoyo1 = [
 'googleanalytlcs.net',
 'googlesyndication.com',
 'googlesyndioation.com',
+'googletagmanager.com',
+'googletagservices.com',
 'googlevirustemizleme.com',
 'googlle.in',
 'googlus.com',
@@ -6113,7 +6129,6 @@ var yoyo1 = [
 'rotabanner.com',
 'rotatearound32.com',
 'rotatingbannerads.com',
-'rottentomatoes.com',
 'roundstorm.com',
 'roxr.net',
 'roxyaffiliates.com',
@@ -13506,7 +13521,6 @@ var yoyo2 = [
 'partners.visiads.com',
 'partners.xhamster.com',
 'passificadormirc.xpg.com.br',
-'passport.baidu.com',
 'path.trackinglabs.com',
 'paty88.xpg.com.br',
 'pay.tranent.nl',
