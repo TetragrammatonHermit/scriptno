@@ -385,6 +385,8 @@ function listUpdate() {
 	}
 	$('#whitelist').html(whitelistCompiled);
 	$('#blacklist').html(blacklistCompiled);
+	$(".domainRemover").click(function() { domainRemover($(this).attr('rel'));});
+	$(".topDomainAdd").click(function() { topDomainAdd($(this).attr('title'), $(this).attr('rel'));});
 	updateExport();
 }
 function listclear(type) {
