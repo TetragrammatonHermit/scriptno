@@ -19,7 +19,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	$(".close").click(closeOptions);
 	$("#syncimport").click(forceSyncImport);
 	$("#syncexport").click(forceSyncExport);
+	$("#restoretool").click(restoretool);
 });
+function restoretool() {
+	status = bkg.listsSync(3);
+	if (status == 'false') {
+		alert('ScriptSafe could not find a backup of your previous whitelist/blacklist.');
+	}
+}
 function forceSyncExport() {
 	if(confirm('Do you want to sync your current settings to your Google Account?\r\nNote: please do not press this frequently; there is a limit of 10 per minute and 1,000 per hour.')) {
 		bkg.freshSync(0, true);

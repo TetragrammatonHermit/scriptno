@@ -33,18 +33,33 @@ if (typeof chrome.webRequest !== 'undefined' && typeof chrome.contentSettings !=
 	requestUrls = ["http://*/*", "https://*/*"];
 	refreshRequestTypes();
 	if (typeof chrome.webRequest !== 'undefined') {
-		chrome.webRequest.onBeforeSendHeaders.addListener(mitigate, {"types": requestTypes, "urls": requestUrls}, ["requestHeaders", "blocking"]);
 		chrome.webRequest.onBeforeRequest.addListener(ScriptSafe, {"types": requestTypes, "urls": requestUrls}, ['blocking']);
+		chrome.webRequest.onBeforeSendHeaders.addListener(mitigate, {"types": requestTypes, "urls": requestUrls}, ['requestHeaders', 'blocking']);
 	}
 }
 function mitigate(req) {
 	//console.log(req);
+	if (localStorage["enable"] == "false" || (localStorage['useragentspoof'] == 'off' && localStorage['cookies'] == 'false' && localStorage['referrerspoof'] == 'off')) {
+		return;
+	}
 	if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true') {
 		chrome.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
 	}
 	for (i = 0; i < req.requestHeaders.length; i++) {
 		if (req.requestHeaders[i].name == 'User-Agent' || req.requestHeaders[i].name == 'Referer' || req.requestHeaders[i].name == 'Cookie') {
 			switch (req.requestHeaders[i].name) {
+				case 'Cookie':
+					if (localStorage['cookies'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial'])) 
+						req.requestHeaders[i].value = '';
+					break;
+				case 'Referer':
+					if (localStorage['referrerspoof'] == 'same')
+						req.requestHeaders[i].value = req.url;
+					else if (localStorage['referrerspoof'] == 'domain')
+						req.requestHeaders[i].value = req.url.split("//")[0]+'//'+req.url.split("/")[2];
+					else if (localStorage['referrerspoof'] != 'off')
+						req.requestHeaders[i].value = localStorage['referrerspoof'];
+					break;
 				case 'User-Agent':
 					if (localStorage['useragentspoof'] != 'off' && enabled(req.url) == 'true' && req.url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) {
 						if (localStorage['useragentspoof_os'] == 'w7') os = 'Windows; U; Windows NT 6.1';
@@ -91,54 +106,52 @@ function mitigate(req) {
 							req.requestHeaders[i].value = 'Mozilla/5.0 ('+os+') AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1';
 					}
 					break;
-				case 'Cookie':
-					if (localStorage['cookies'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial'])) 
-						req.requestHeaders[i].value = '';
-					break;
-				case 'Referer':
-					if (localStorage['referrerspoof'] == 'same')
-						req.requestHeaders[i].value = req.url;
-					else if (localStorage['referrerspoof'] == 'domain')
-						req.requestHeaders[i].value = req.url.split("//")[0]+'//'+req.url.split("/")[2];
-					else if (localStorage['referrerspoof'] != 'off')
-						req.requestHeaders[i].value = localStorage['referrerspoof'];
-					break;
 			}
 		}
 	}
 	return { requestHeaders: req.requestHeaders };
 }
 function ScriptSafe(req) {
+	if (localStorage["enable"] == "false" || req.tabId == -1 || req.url == 'undefined') {
+		return;
+	}
 	//console.log(req);
-	if (req.tabId != -1) {
-		chrome.tabs.get(req.tabId, function(tab) {
-			if (tab !== 'undefined') {
-				if (tab.url !== 'undefined' && tab.url.toLowerCase().substr(0,4) == 'http' && enabled(tab.url.toLowerCase())) {
-					reqtype = req.type;
-					if (typeof ITEMS[req.tabId] === 'undefined') {
-						resetTabData(req.tabId, req.url);
-					}
-					if (reqtype == "sub_frame") reqtype = 'frame';
-					else if (reqtype == "main_frame") reqtype = 'page';
-					// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
-					if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && elementStatus(req.url, localStorage['mode'], tab.url) && (((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(tab.url.toLowerCase()))) || localStorage['preservesamedomain'] == 'false')) || ((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(req.url).toLowerCase(), 1) != '0')) && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')))) {
-						//console.log("BLOCKED: "+reqtype+"|"+req.url);
-						if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
-						ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
-						updateCount(req.tabId);
-						return { cancel: true };
-					} else {
-						if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
-							//console.log("ALLOWED: "+reqtype+"|"+req.url);
-							ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
-						}
-						return { cancel: false };
-					}
-				}
+	if (req.type == 'main_frame') {
+		if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true') {
+			chrome.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
+		}
+		if (typeof ITEMS[req.tabId] === 'undefined') {
+			resetTabData(req.tabId, req.url.toLowerCase());
+		} else {
+			ITEMS[req.tabId]['url'] = req.url.toLowerCase();
+		}
+	}
+	if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && req.url.toLowerCase().substr(0,4) == 'http') {
+		reqtype = req.type;
+		if (reqtype == "sub_frame") reqtype = 'frame';
+		else if (reqtype == "main_frame") reqtype = 'page';
+		// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
+		if (elementStatus(req.url, localStorage['mode'], ITEMS[req.tabId]['url']) && (((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(req.url).toLowerCase(), 1) != '0')) && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) || ((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(ITEMS[req.tabId]['url'].toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(ITEMS[req.tabId]['url'].toLowerCase()))) || localStorage['preservesamedomain'] == 'false')))) {
+			//console.log("BLOCKED: "+reqtype+"|"+req.url);
+			if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
+			ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
+			updateCount(req.tabId);
+			if (reqtype == 'frame') {
+				return { redirectUrl: 'about:blank' };
+			} else if (reqtype == 'image') {
+				return { redirectUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==' };
+				// https://adblockplus.org/forum/viewtopic.php?t=7422&start=60#p50994
+			}
+			return { cancel: true };
+		} else {
+			if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
+				//console.log("ALLOWED: "+reqtype+"|"+req.url);
+				ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
 			}
 			return { cancel: false };
-		});
+		}
 	}
+	return { cancel: false };
 }
 function enabled(url) {
 	if (localStorage["enable"] == "true" && domainCheck(url) != '0' && (domainCheck(url) == '1' || (localStorage["mode"] == "block" && domainCheck(url)) == '-1') && url.toLowerCase().indexOf('https://chrome.google.com/webstore') == -1) return 'true';
@@ -690,11 +703,14 @@ function listsSync(mode) {
 		else localStorage['blackList'] = JSON.stringify(concatlistarr);
 	} else if (mode == '3') {
 		if (localStorage["whiteList_0"] || localStorage["blackList_0"]) {
-			if(confirm('My sincere apologies if your whitelists/blacklists were seemingly wiped out! I\'ve put together a fix.\r\n\r\nPlease press OK to restore your lists.\r\n\r\nAfterwards, please make a backup and proceed to sync your settings to your Google Account from the Options page that will open once you\'re ready.')) {
+			if(confirm('My sincere apologies if your whitelist/blacklist appeared to be wiped out!\r\n\r\nA backup of your whitelist/blacklist was found.\r\n\r\nPlease press OK to restore your lists.\r\n\r\nIf you aren\'t ready, you can click on Cancel and start this process from the Options page by clicking on the "Try to Restore Whitelist/Blacklist" button.')) {
 				var concatlist;
 				concatlist = '';
 				for (i = 0; i < 5; i++) {
-					if (localStorage['whiteList_'+i]) concatlist += localStorage['whiteList_'+i];
+					if (localStorage['whiteList_'+i]) {
+						concatlist += localStorage['whiteList_'+i];
+						delete localStorage['whiteList_'+i];
+					}
 				}
 				if (typeof(localStorage["whiteList_0"]) == 'string') {
 					concatlistarr = concatlist.split(",");
@@ -705,7 +721,10 @@ function listsSync(mode) {
 				}
 				concatlist = '';
 				for (i = 0; i < 5; i++) {
-					if (localStorage['blackList_'+i]) concatlist += localStorage['blackList_'+i];
+					if (localStorage['blackList_'+i]) {
+						concatlist += localStorage['blackList_'+i];
+						delete localStorage['blackList_'+i];
+					}
 				}
 				if (typeof(localStorage["blackList_0"]) == 'string') {
 					concatlistarr = concatlist.split(",");
@@ -716,7 +735,10 @@ function listsSync(mode) {
 				}
 				alert('Successfully restored your settings!\r\n\r\nThe Options page will now open where you can review your whitelist/blacklist and choose to sync them to your Google Account (and/or sync from your Google Account)');
 				chrome.tabs.create({url: chrome.extension.getURL('html/options.html')});
+				return true;
 			}
+		} else {
+			return false;
 		}
 	}
 }
@@ -740,11 +762,8 @@ if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("blackList_2")) delete localStorage['blackList_2'];
 	if (optionExists("blackList_2")) delete localStorage['blackList_3'];
 	*/
-	if ((version == '1.0.6.3' || version == '1.0.6.4' || version == '1.0.6.5' || version == '1.0.6.6' || version == '1.0.6.7' || version == '1.0.6.8' || version == '1.0.6.9') && storageapi) { // clean up extraneous sync nodes => let's be as tidy as possible!
-		chrome.storage.sync.clear();
-		if (localStorage['sync'] == 'true') {
-			listsSync(3);
-		}
+	if (localStorage['sync'] == 'true') {
+		listsSync(3);
 	}
 	localStorage["version"] = version;
 	if (localStorage["updatenotify"] == "true") {
