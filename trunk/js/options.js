@@ -1,5 +1,6 @@
 // (c) Andrew Y. <andryou@gmail.com>
 // Supporting functions by AdThwart - T. Joseph
+var syncstatus;
 document.addEventListener('DOMContentLoaded', function () {
 	loadOptions();
 	$(".domainRemover").click(function() { domainRemover($(this).attr('rel'));});
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	$("#syncimport").click(forceSyncImport);
 	$("#syncexport").click(forceSyncExport);
 	$("#restoretool").click(restoretool);
+	syncstatus = localStorage['syncenable'];
 });
 function restoretool() {
 	status = bkg.listsSync(3);
@@ -29,14 +31,19 @@ function restoretool() {
 }
 function forceSyncExport() {
 	if(confirm('Do you want to sync your current settings to your Google Account?\r\nNote: please do not press this frequently; there is a limit of 10 per minute and 1,000 per hour.')) {
-		bkg.freshSync(0, true);
-		notification('Settings successfully synced to your Google Account');
+		status = bkg.freshSync(0, true);
+		if (status == 'true') {
+			notification('Settings successfully synced to your Google Account');
+		}
 	}
 }
 function forceSyncImport() {
 	if(confirm('Do you want to import the synced settings from your Google Account to this device?')) {
-		bkg.importSyncHandle(1);
-		notification('Settings successfully synced from your Google Account to this device');
+		status = bkg.importSyncHandle(1);
+		if (status == 'true') {
+			notification('Settings successfully synced from your Google Account to this device');
+			location.reload();
+		}
 	}
 }
 function importbulkwhite() {
@@ -91,6 +98,18 @@ function loadElement(id) {
 }
 function saveCheckbox(id) {
 	localStorage[id] = document.getElementById(id).checked;
+	if (id == 'syncenable') {
+		if (!document.getElementById(id).checked) {
+			syncstatus = 'false';
+			return;
+		}
+		if (syncstatus == 'false') {
+			alert('You have enabled auto-syncing. In order to prevent erasing your previously synced data (if any), please click on "Sync Settings FROM Google Account".');
+			syncstatus = 'true';
+		} else {
+			syncstatus = 'true';
+		}
+	}
 }
 function saveElement(id) {
 	localStorage[id] = $("#"+id).val();

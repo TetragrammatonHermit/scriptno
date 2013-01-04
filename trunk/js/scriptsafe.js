@@ -42,9 +42,6 @@ function mitigate(req) {
 	if (localStorage["enable"] == "false" || (localStorage['useragentspoof'] == 'off' && localStorage['cookies'] == 'false' && localStorage['referrerspoof'] == 'off')) {
 		return;
 	}
-	if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true') {
-		chrome.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
-	}
 	for (i = 0; i < req.requestHeaders.length; i++) {
 		if (req.requestHeaders[i].name == 'User-Agent' || req.requestHeaders[i].name == 'Referer' || req.requestHeaders[i].name == 'Cookie') {
 			switch (req.requestHeaders[i].name) {
@@ -115,24 +112,30 @@ function ScriptSafe(req) {
 	if (localStorage["enable"] == "false" || req.tabId == -1 || req.url == 'undefined') {
 		return;
 	}
-	//console.log(req);
+	/*
+	console.log('------ New Request ------');
+	console.log('Request: '+req.url);
+	if (typeof ITEMS[req.tabId] !== 'undefined') console.log('Parent Page: '+ITEMS[req.tabId]['url']);
+	console.log(req);
+	*/
+	requrl = req.url.toLowerCase();
 	if (req.type == 'main_frame') {
-		if (localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(req.url.toLowerCase()) == 'true') {
-			chrome.contentSettings.javascript.set({primaryPattern: '*://'+extractDomainFromURL(req.url.toLowerCase())+'/*', setting: 'block'});
+		if (experimental == '1' && localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(requrl) == 'true') {
+			chrome.contentSettings['javascript'].set({primaryPattern: '*://'+extractDomainFromURL(requrl)+'/*', setting: 'block'});
 		}
 		if (typeof ITEMS[req.tabId] === 'undefined') {
-			resetTabData(req.tabId, req.url.toLowerCase());
+			resetTabData(req.tabId, requrl);
 		} else {
-			ITEMS[req.tabId]['url'] = req.url.toLowerCase();
+			ITEMS[req.tabId]['url'] = requrl;
 		}
 	}
-	if (req.url.toLowerCase().substr(0,17) != 'chrome-extension:' && req.url.toLowerCase().substr(0,4) == 'http') {
+	if (requrl.substr(0,17) != 'chrome-extension:' && requrl.substr(0,4) == 'http') {
 		reqtype = req.type;
 		if (reqtype == "sub_frame") reqtype = 'frame';
 		else if (reqtype == "main_frame") reqtype = 'page';
 		// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
-		if (elementStatus(req.url, localStorage['mode'], ITEMS[req.tabId]['url']) && (((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(req.url).toLowerCase(), 1) != '0')) && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(req.url, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) || ((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(req.url, extractDomainFromURL(ITEMS[req.tabId]['url'].toLowerCase()))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(req.url, extractDomainFromURL(ITEMS[req.tabId]['url'].toLowerCase()))) || localStorage['preservesamedomain'] == 'false')))) {
-			//console.log("BLOCKED: "+reqtype+"|"+req.url);
+		if (elementStatus(requrl, localStorage['mode'], ITEMS[req.tabId]['url']) && (((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(requrl), 1) != '0')) && baddies(requrl, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(requrl, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) || ((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(requrl, extractDomainFromURL(ITEMS[req.tabId]['url']))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(requrl, extractDomainFromURL(ITEMS[req.tabId]['url']))) || localStorage['preservesamedomain'] == 'false')))) {
+			//console.log("BLOCKED: "+reqtype+"|"+requrl);
 			if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
 			ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
 			updateCount(req.tabId);
@@ -145,7 +148,7 @@ function ScriptSafe(req) {
 			return { cancel: true };
 		} else {
 			if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
-				//console.log("ALLOWED: "+reqtype+"|"+req.url);
+				//console.log("ALLOWED: "+reqtype+"|"+requrl);
 				ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
 			}
 			return { cancel: false };
@@ -323,7 +326,7 @@ function defaultOptionValue(opt, val) {
 function setDefaultOptions() {
 	defaultOptionValue("version", version);
 	defaultOptionValue("sync", "false");
-	defaultOptionValue("syncenable", "true");
+	defaultOptionValue("syncenable", "false");
 	defaultOptionValue("syncnotify", "true");
 	defaultOptionValue("syncfromnotify", "true");
 	defaultOptionValue("updatenotify", "true");
@@ -402,12 +405,13 @@ chrome.tabs.onRemoved.addListener(function(tabid) {
 	delete ITEMS[tabid];
 });
 chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
-	if (localStorage['enable'] == 'true' && tab.url.toLowerCase().substr(0,4) == 'http') {
+	taburl = tab.url.toLowerCase();
+	if (localStorage['enable'] == 'true' && taburl.substr(0,4) == 'http') {
 		if (changeinfo.status == 'loading') {
 			icontype = "Allowed";
-			if (enabled(tab.url) == "true")
+			if (enabled(taburl) == "true")
 				icontype = "Forbidden";
-			if (in_array(extractDomainFromURL(tab.url.toLowerCase()), JSON.parse(sessionStorage["whiteList"])) || (extractDomainFromURL(tab.url).toLowerCase().substr(0,4) == 'www.' && in_array(extractDomainFromURL(tab.url.toLowerCase()).substr(4), JSON.parse(sessionStorage["whiteList"]))) || in_array(extractDomainFromURL(tab.url.toLowerCase()), JSON.parse(sessionStorage["blackList"])) || (extractDomainFromURL(tab.url).toLowerCase().substr(0,4) == 'www.' && in_array(extractDomainFromURL(tab.url.toLowerCase()).substr(4), JSON.parse(sessionStorage["blackList"]))))
+			if (in_array(extractDomainFromURL(taburl), JSON.parse(sessionStorage["whiteList"])) || (extractDomainFromURL(taburl).substr(0,4) == 'www.' && in_array(extractDomainFromURL(taburl).substr(4), JSON.parse(sessionStorage["whiteList"]))) || in_array(extractDomainFromURL(taburl), JSON.parse(sessionStorage["blackList"])) || (extractDomainFromURL(taburl).substr(0,4) == 'www.' && in_array(extractDomainFromURL(taburl).substr(4), JSON.parse(sessionStorage["blackList"]))))
 				icontype = "Temp";
 			chrome.browserAction.setIcon({path: "../img/Icon"+icontype+".png", tabId: tabid});
 		} else if (changeinfo.status == "complete") {
@@ -598,18 +602,16 @@ function freshSync(mode, force) {
 			localStorage['blackListCount'] = i;
 			settingssync['blackListCount'] = i;
 		//}
-			if (localStorage['syncnotify'] == 'true' && localStorage['syncenable'] == 'true') {
-				var milliseconds = (new Date).getTime();
-				localStorage['lastSync'] = milliseconds;
-				settingssync['lastSync'] = milliseconds;
-				chrome.storage.sync.set(settingssync, function() {
-					if (chrome.extension.lastError){
-						alert(chrome.extension.lastError.message);
-					} else {
-						webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
-					}
-				});
-			}
+			var milliseconds = (new Date).getTime();
+			localStorage['lastSync'] = milliseconds;
+			settingssync['lastSync'] = milliseconds;
+			chrome.storage.sync.set(settingssync, function() {
+				if (chrome.extension.lastError){
+					alert(chrome.extension.lastError.message);
+				} else {
+					if (localStorage['syncnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncnotification.html')).show();
+				}
+			});
 		} else {
 			synctimer = window.setTimeout(function() { syncQueue() }, 30000);
 		}
@@ -627,7 +629,7 @@ if (storageapi) {
 			if (typeof changes['lastSync'] !== 'undefined') {
 				if (changes['lastSync'].newValue != localStorage['lastSync']) {
 					importSync(changes, 1);
-					if (localStorage['syncfromnotify']) webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncfromnotification.html')).show();
+					if (localStorage['syncfromnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncfromnotification.html')).show();
 				}
 			}
 		}
@@ -636,30 +638,41 @@ if (storageapi) {
 }
 function importSyncHandle(mode) {
 	if (storageapi) {
-		if (mode == '1' || (localStorage['sync'] == 'false' && localStorage['syncenable'] == 'true' && mode == '0')) {
+		if (mode == '1' || (localStorage['sync'] == 'false' && mode == '0')) {
 			chrome.storage.sync.get(null, function(changes) {
 				if (typeof changes['lastSync'] !== 'undefined' && typeof changes['scriptsafe_settings'] !== 'undefined' && (typeof changes['zw0'] !== 'undefined' || typeof changes['zb0'] !== 'undefined')) {
-					if (mode == '1' || confirm("ScriptSafe has detected that you have settings synced for your Google account from another device!\r\n\r\nDo you want to import the settings?")) {
-						importSync(changes, 2);
-						localStorage['sync'] = 'true';
-					} else {
-						syncenable();
+					if (changes['zw0'] != '' && changes['zw0'] != 'translate.googleapis.com,talkgadget.google.com,mail.google.com,youtube.com,s.ytimg.com,maps.gstatic.com') { // ensure synced whitelist is not empty and not the default
+						if (confirm("ScriptSafe has detected that you have settings synced on your Google account!\r\n\r\nClick on 'OK' if you want to import the settings from your Google Account.")) {
+							localStorage['syncenable'] = 'true';
+							localStorage['sync'] = 'true';
+							importSync(changes, 2);
+							if (localStorage['syncfromnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncfromnotification.html')).show();
+							return true;
+						} else {
+							localStorage['syncenable'] = 'false';
+							alert('Syncing has been disabled to prevent overwriting your already synced data.\r\n\r\nFeel free to go to the Options page at any time to sync your settings (make a backup of your settings if necessary).');
+							localStorage['sync'] = 'true'; // set to true so user isn't prompted with this message every time they start Chrome; localStorage['sync'] == true does not mean syncing is enabled, it's more like an acknowledgement flag
+							return false;
+						}
 					}
 				} else {
-					if (confirm("It appears you haven't synced your settings yet.\r\n\r\nScriptSafe is about to sync your current settings to your Google account.\r\n\r\nDo you want to continue?\r\n\r\nIf not, please update ScriptSafe on the device with the settings you want to sync and click on OK when you are presented with this message.")) {
-						syncstatus = freshSync(0, true);
+					if (confirm("It appears you haven't synced your settings to your Google account yet.\r\n\r\nScriptSafe is about to sync your current settings to your Google account.\r\n\r\nClick on 'OK' if you want to continue.\r\n\r\nIf not, click 'Cancel', and on the other device with your preferred settings, update ScriptSafe and click on OK when you are presented with this message.")) {
+						localStorage['syncenable'] = 'true';
 						localStorage['sync'] = 'true';
-						if (!syncstatus) {
-							alert('Your current version of Google Chrome does not support settings syncing. Please try updating your Chrome version and try again.');
-						}
+						freshSync(0, true);
+						return true;
 					} else {
-						syncenable();
+						localStorage['syncenable'] = 'false';
+						alert('Syncing is disabled.\r\n\r\nFeel free to go to the Options page at any time to sync your settings (make a backup of your settings if necessary).');
+						localStorage['sync'] = 'true'; // set to true so user isn't prompted with this message every time they start Chrome; localStorage['sync'] == true does not mean syncing is enabled, it's more like an acknowledgement flag
+						return false;
 					}
 				}
 			});
 		}
 	} else {
 		alert('Your current version of Google Chrome does not support settings syncing. Please try updating your Chrome version and try again.');
+		return false;
 	}
 }
 function importSync(changes, mode) {
@@ -742,29 +755,10 @@ function listsSync(mode) {
 		}
 	}
 }
-function syncenable() {
-	if (confirm("Do you want to enable settings syncing?")) {
-		localStorage['syncenable'] = 'true';
-	} else {
-		localStorage['syncenable'] = 'false';
-	}
-}
 if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
-	// v1.0.6.3 - v1.0.6.8 - delete obsoletely named whiteList/blackList localStorage rows
-	/*
-	if (optionExists("whiteList_0")) delete localStorage['whiteList_0'];
-	if (optionExists("whiteList_1")) delete localStorage['whiteList_1'];
-	if (optionExists("whiteList_2")) delete localStorage['whiteList_2'];
-	if (optionExists("whiteList_3")) delete localStorage['whiteList_3'];
-	if (optionExists("blackList_0")) delete localStorage['blackList_0'];
-	if (optionExists("blackList_1")) delete localStorage['blackList_1'];
-	if (optionExists("blackList_2")) delete localStorage['blackList_2'];
-	if (optionExists("blackList_2")) delete localStorage['blackList_3'];
-	*/
-	if (localStorage['sync'] == 'true') {
-		listsSync(3);
-	}
+	// Attempt to restore whitelist/blacklist if detected.
+	listsSync(3);
 	localStorage["version"] = version;
 	if (localStorage["updatenotify"] == "true") {
 		chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });
