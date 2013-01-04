@@ -92,8 +92,10 @@ var version = (function () {
 									if (response.blockeditems[i][1] == 'NOSCRIPT') itemdomain = 'no.script';
 									else if (response.blockeditems[i][1] == 'WEBBUG') itemdomain = 'web.bug';
 									if (itemdomain) {
+										baddiesstatus = bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial);
+										itemdomainanchor = itemdomain + baddiesstatus;
 										blocked.push([itemdomain, bkg.domainCheck(itemdomain)]);
-										if ($('.thirds .thirditem[rel="x_'+itemdomain+'"]').length == 0) {
+										if ($('.thirds .thirditem[rel="x_'+itemdomainanchor+'"]').length == 0) {
 											if (bkg.domainCheck(itemdomain, 1) == '1') {
 												trustval0 = '';
 												trustval1 = '';
@@ -104,39 +106,39 @@ var version = (function () {
 													trustval1 = ' selected';
 													allowedtype = 4;
 												} else allowedtype = 1;
-												$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval0+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist selected" rel="1" title="Deny">Deny</span><span class="box box2 x_trust'+trustval1+'" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
-												if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == '2')) {
+												$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomainanchor+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval0+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist selected" rel="1" title="Deny">Deny</span><span class="box box2 x_trust'+trustval1+'" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+												if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && baddiesstatus == 1) || (response.antisocial == 'true' && baddiesstatus == '2')) {
 												
 												} else {
 													if (mode == 'allow') {
-														$("[rel='"+itemdomain+"']").prepend('<span class="box box4 x_'+itemdomain.replace(/\./g,"_")+'" title="Clear">Clear</span>');
-														$(".x_"+itemdomain.replace(/\./g,"_")).bind("click", x_removehandle);
+														$("[rel='"+itemdomainanchor+"'] [rel='"+itemdomain+"']").prepend('<span class="box box4 x_'+itemdomain.replace(/\./g,"_")+'" title="Clear">Clear</span>');
+														$("[rel='"+itemdomainanchor+"'] .x_"+itemdomain.replace(/\./g,"_")).bind("click", x_removehandle);
 													}
 												}
 											} else {
 												if (response.blockeditems[i][1] == 'NOSCRIPT' || response.blockeditems[i][1] == 'WEBBUG') {
-													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>&lt;'+response.blockeditems[i][1]+'&gt;</span> (<span rel="count_'+itemdomain+'">1</span>)</span></div>');
+													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomainanchor+'"><span><span>&lt;'+response.blockeditems[i][1]+'&gt;</span> (<span rel="count_'+itemdomain+'">1</span>)</span></div>');
 												} else {
-													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
+													$(".thirds").append('<div class="thirditem" title="['+response.blockeditems[i][1]+'] '+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomainanchor+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
 												}
 											}
 										} else {
-											$(".thirds [rel='x_"+itemdomain+"']").attr("title",$(".thirds [rel='x_"+itemdomain+"']").attr("title")+"\r\n["+response.blockeditems[i][1]+"] "+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&")));
+											$(".thirds [rel='x_"+itemdomainanchor+"']").attr("title",$(".thirds [rel='x_"+itemdomainanchor+"']").attr("title")+"\r\n["+response.blockeditems[i][1]+"] "+$.trim(response.blockeditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&")));
 											$(".thirds [rel='count_"+itemdomain+"']").html((parseInt($(".thirds [rel='count_"+itemdomain+"']").html())+1));
 										}
 										if (response.rating == 'true') $("[rel='r_"+itemdomain+"']").html('<span class="wot"><span class="box box4" title="See Rating for '+itemdomain+'"><a href="http://www.mywot.com/en/scorecard/'+itemdomain+'" target="_blank">Rating</a></span></span>');
-										if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '2')) {
-											$(".thirds").append($(".thirds [rel='x_"+itemdomain+"']"));
-											$("[rel='"+itemdomain+"'] .box1, [rel='"+itemdomain+"'] .x_trust, [rel='"+itemdomain+"'] .box3").remove();
-											if (response.antisocial == 'true' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '2') {
-												$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Antisocial").html("Antisocial").addClass("selected");
+										if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && baddiesstatus == 1) || (response.antisocial == 'true' && baddiesstatus == '2')) {
+											$(".thirds").append($(".thirds [rel='x_"+itemdomainanchor+"']"));
+											$("[rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .box1, [rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .x_trust, [rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .box3").remove();
+											if (response.antisocial == 'true' && baddiesstatus == '2') {
+												$("[rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .x_blacklist").attr("title","Antisocial").html("Antisocial").addClass("selected");
 											} else {
-												$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Unwanted Content Provider").html("Unwanted").addClass("selected");
+												$("[rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .x_blacklist").attr("title","Unwanted Content Provider").html("Unwanted").addClass("selected");
 											}
 											undesirablecount++;
-										} else if (response.annoyances == 'true' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(response.blockeditems[i][0].toLowerCase(), response.annoyancesmode, response.antisocial) == '1') {
-											$("[rel='"+itemdomain+"'] .x_"+itemdomain.replace(/\./g,"_")).remove();
-											$("[rel='"+itemdomain+"'] .x_blacklist").attr("title","Unwanted Content Provider").html("Unwanted").addClass("selected");
+										} else if (response.annoyances == 'true' && bkg.domainCheck(itemdomain, 1) == '-1' && baddiesstatus == '1') {
+											$("[rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .x_"+itemdomain.replace(/\./g,"_")).remove();
+											$("[rel='x_"+itemdomainanchor+"'] [rel='"+itemdomain+"'] .x_blacklist").attr("title","Unwanted Content Provider").html("Unwanted").addClass("selected");
 										}
 									}
 									if (mode == 'allow') {
@@ -186,13 +188,9 @@ var version = (function () {
 													allowedtype = 4;
 												} else allowedtype = 0;
 												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="'+allowedtype+'"><span class="box box1 x_whitelist selected" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust'+trustval0+'" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust'+trustval1+'" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
-												if ((response.annoyances == 'true' && response.annoyancesmode == 'strict' && bkg.domainCheck(itemdomain, 1) == '-1' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == 1) || (response.antisocial == 'true' && bkg.baddies(taburl, response.annoyancesmode, response.antisocial) == '2')) {
-												
-												} else {
-													if (mode == 'block') {
-														$("#allowed [rel='"+itemdomain+"']").prepend('<span class="box box4 x_'+itemdomain.replace(/\./g,"_")+'" title="Clear">Clear</span>');
-														$("#allowed .x_"+itemdomain.replace(/\./g,"_")).bind("click", x_removehandle);
-													}
+												if (mode == 'block') {
+													$("#allowed [rel='"+itemdomain+"']").prepend('<span class="box box4 x_'+itemdomain.replace(/\./g,"_")+'" title="Clear">Clear</span>');
+													$("#allowed .x_"+itemdomain.replace(/\./g,"_")).bind("click", x_removehandle);
 												}
 											} else {
 												$("#allowed").append('<div class="thirditem" title="['+response.alloweditems[i][1]+'] '+$.trim(response.alloweditems[i][0].replace(/"/g, "'").replace(/\&lt;/g, "<").replace(/\&gt;/g, ">").replace(/\&amp;/g, "&"))+'" rel="x_'+itemdomain+'"><span><span>'+itemdomain+'</span> (<span rel="count_'+itemdomain+'">1</span>)</span><br /><span rel="r_'+itemdomain+'"></span><span class="choices" rel="'+itemdomain+'" sn_list="-1"><span class="box box1 x_whitelist" rel="0" title="Allow Domain">Allow</span><span class="box box1 x_trust" rel="3" title="Trust Entire Domain">Trust</span><span class="box box2 x_blacklist" rel="1" title="Deny">Deny</span><span class="box box2 x_trust" rel="4" title="Distrust Entire Domain">Distrust</span><span class="box box3 x_bypass" rel="2" title="Temp.">Temp.</span></span></div>');
