@@ -20,7 +20,7 @@ function refreshRequestTypes() {
 		requestTypes.push('object');
 	if (localStorage['script'] == 'true')
 		requestTypes.push('script');
-	if (localStorage['image'] == 'true')
+	if (localStorage['image'] == 'true' || localStorage['webbugs'] == 'true')
 		requestTypes.push('image');
 	if (localStorage['xml'] == 'true')
 		requestTypes.push('xmlhttprequest');
@@ -108,16 +108,23 @@ function mitigate(req) {
 	}
 	return { requestHeaders: req.requestHeaders };
 }
+function UrlInList(elems, url) { // credit: vnagarnaik: https://code.google.com/p/scriptno/issues/detail?id=80
+	var foundElem = false;
+	for (var i = elems.length - 1; i >= 0; i--) {
+		if (elems[i].indexOf(url) > -1) {
+			foundElem = true;
+			break;
+		}
+	}
+	return foundElem;
+}
+function removeParams(str) {
+	return str.replace(/#[^#]*$/, "").replace(/\?[^\?]*$/, "");
+}
 function ScriptSafe(req) {
-	if (localStorage["enable"] == "false" || req.tabId == -1 || req.url == 'undefined') {
+	if (req.tabId == -1 || req.url == 'undefined' || localStorage["enable"] == "false") {
 		return;
 	}
-	/*
-	console.log('------ New Request ------');
-	console.log('Request: '+req.url);
-	if (typeof ITEMS[req.tabId] !== 'undefined') console.log('Parent Page: '+ITEMS[req.tabId]['url']);
-	console.log(req);
-	*/
 	requrl = req.url.toLowerCase();
 	if (req.type == 'main_frame') {
 		if (experimental == '1' && localStorage['preservesamedomain'] == 'false' && localStorage['script'] == 'true' && enabled(requrl) == 'true') {
@@ -133,12 +140,23 @@ function ScriptSafe(req) {
 		reqtype = req.type;
 		if (reqtype == "sub_frame") reqtype = 'frame';
 		else if (reqtype == "main_frame") reqtype = 'page';
-		// video/audio would be caught by the "other" request type, but "other" also matches favicons (bad!)
-		if (elementStatus(requrl, localStorage['mode'], ITEMS[req.tabId]['url']) && (((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(requrl), 1) != '0')) && baddies(requrl, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') || (localStorage['antisocial'] == 'true' && baddies(requrl, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')) || ((((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(requrl, extractDomainFromURL(ITEMS[req.tabId]['url']))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(requrl, extractDomainFromURL(ITEMS[req.tabId]['url']))) || localStorage['preservesamedomain'] == 'false')))) {
+		else if (reqtype == "image") reqtype = 'webbug';
+		if (elementStatus(requrl, localStorage['mode'], ITEMS[req.tabId]['url'])
+		&& (
+			(
+				(((localStorage['annoyances'] == 'true' && (localStorage['annoyancesmode'] == 'strict' || (localStorage['annoyancesmode'] == 'relaxed' && domainCheck(relativeToAbsoluteUrl(requrl), 1) != '0'))) || (localStorage['webbugs'] == 'true' && reqtype == "image")) && baddies(requrl, localStorage['annoyancesmode'], localStorage['antisocial']) == '1')
+				|| (localStorage['antisocial'] == 'true' && baddies(requrl, localStorage['annoyancesmode'], localStorage['antisocial']) == '2')
+			)
+		|| (
+			(((reqtype == "frame" && (localStorage['iframe'] == 'true' || localStorage['frame'] == 'true')) || (reqtype == "script" && localStorage['script'] == 'true') || (reqtype == "object" && (localStorage['object'] == 'true' || localStorage['embed'] == 'true')) || (reqtype == "image" && localStorage['image'] == 'true') || (reqtype == "xmlhttprequest" && localStorage['xml'] == 'true' && thirdParty(requrl, extractDomainFromURL(ITEMS[req.tabId]['url']))))) && ((localStorage['preservesamedomain'] == 'true' && thirdParty(requrl, extractDomainFromURL(ITEMS[req.tabId]['url']))) || localStorage['preservesamedomain'] == 'false')
+			)
+		)) {
 			//console.log("BLOCKED: "+reqtype+"|"+requrl);
 			if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
-			ITEMS[req.tabId]['blocked'].push([req.url, reqtype.toUpperCase()]);
-			updateCount(req.tabId);
+			if (!in_array(removeParams(req.url), ITEMS[req.tabId]['blocked'])) {
+				ITEMS[req.tabId]['blocked'].push([removeParams(req.url), reqtype.toUpperCase()]);
+				updateCount(req.tabId);
+			}
 			if (reqtype == 'frame') {
 				return { redirectUrl: 'about:blank' };
 			} else if (reqtype == 'image') {
@@ -147,9 +165,11 @@ function ScriptSafe(req) {
 			}
 			return { cancel: true };
 		} else {
-			if (reqtype != 'image' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
+			if (reqtype != 'webbug' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
 				//console.log("ALLOWED: "+reqtype+"|"+requrl);
-				ITEMS[req.tabId]['allowed'].push([req.url, reqtype.toUpperCase()]);
+				if (!in_array(removeParams(req.url), ITEMS[req.tabId]['allowed'])) {
+					ITEMS[req.tabId]['allowed'].push([removeParams(req.url), reqtype.toUpperCase()]);
+				}
 			}
 			return { cancel: false };
 		}
@@ -170,16 +190,12 @@ function domainCheck(domain, req) {
 	var blackListSession = JSON.parse(sessionStorage['blackList']);
 	var whiteListSession = JSON.parse(sessionStorage['whiteList']);
 	if (domainname.substr(0,4) == 'www.') {
-		if (localStorage['mode'] == 'allow' && in_array(domainname.substr(4), blackListSession)) return '1';
-		if (localStorage['mode'] == 'block' && in_array(domainname.substr(4), whiteListSession)) return '0';
-		if (in_array(domainname.substr(4), blackList)) return '1';
-		if (in_array(domainname.substr(4), whiteList)) return '0';
-	} else {
-		if (localStorage['mode'] == 'allow' && in_array(domainname, blackListSession)) return '1';
-		if (localStorage['mode'] == 'block' && in_array(domainname, whiteListSession)) return '0';
-		if (in_array(domainname, blackList)) return '1';
-		if (in_array(domainname, whiteList)) return '0';
+		domainname = domainname.substr(4);
 	}
+	if (localStorage['mode'] == 'allow' && in_array(domainname, blackListSession)) return '1';
+	if (localStorage['mode'] == 'block' && in_array(domainname, whiteListSession)) return '0';
+	if (in_array(domainname, blackList)) return '1';
+	if (in_array(domainname, whiteList)) return '0';
 	if (req === undefined) {
 		if (localStorage['annoyances'] == 'true' && localStorage['annoyancesmode'] == 'relaxed' && baddies(domain, localStorage['annoyancesmode'], localStorage['antisocial']) == '1') return '1';
 	}
@@ -359,7 +375,7 @@ function setDefaultOptions() {
 	defaultOptionValue("referrerspoof", "off");
 	defaultOptionValue("cookies", "true");
 	if (!optionExists("blackList")) localStorage['blackList'] = JSON.stringify([]);
-	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com","mail.google.com","youtube.com","s.ytimg.com","maps.gstatic.com"]);
+	if (!optionExists("whiteList")) localStorage['whiteList'] = JSON.stringify(["translate.googleapis.com","talkgadget.google.com","mail.google.com","*.youtube.com","s.ytimg.com","maps.gstatic.com"]);
 	if (typeof sessionStorage['blackList'] === "undefined") sessionStorage['blackList'] = JSON.stringify([]);
 	if (typeof sessionStorage['whiteList'] === "undefined") sessionStorage['whiteList'] = JSON.stringify([]);
 	chrome.browserAction.setBadgeBackgroundColor({color:[208, 0, 24, 255]});
@@ -473,15 +489,19 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		sendResponse({status: localStorage['enable'], enable: enableval, mode: localStorage['mode'], annoyancesmode: localStorage['annoyancesmode'], antisocial: localStorage['antisocial'], annoyances: localStorage['annoyances'], closepage: localStorage['classicoptions'], rating: localStorage['rating'], temp: sessionlist, blockeditems: ITEMS[request.tid]['blocked'], alloweditems: ITEMS[request.tid]['allowed'], domainsort: localStorage['domainsort']});
 		changed = true;
 	} else if (request.reqtype == 'update-blocked') {
-		updateCount(sender.tab.id);
 		if (request.src) {
 			if (typeof ITEMS[sender.tab.id]['blocked'] === 'undefined') ITEMS[sender.tab.id]['blocked'] = [];
-			ITEMS[sender.tab.id]['blocked'].push([request.src, request.node]);
+			if (!in_array(removeParams(request.src), ITEMS[sender.tab.id]['blocked'])) {
+				ITEMS[sender.tab.id]['blocked'].push([removeParams(request.src), request.node]);
+				updateCount(sender.tab.id);
+			}
 		}
 	} else if (request.reqtype == 'update-allowed') {
 		if (request.src) {
 			if (typeof ITEMS[sender.tab.id]['allowed'] === 'undefined') ITEMS[sender.tab.id]['allowed'] = [];
-			ITEMS[sender.tab.id]['allowed'].push([request.src, request.node]);
+			if (!in_array(removeParams(request.src), ITEMS[sender.tab.id]['allowed'])) {
+				ITEMS[sender.tab.id]['blocked'].push([removeParams(request.src), request.node]);
+			}
 		}
 	} else if (request.reqtype == 'save') {
 		domainHandler(request.url, 2, 1);
@@ -549,7 +569,6 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	} else
 		sendResponse({});
 });
-setDefaultOptions();
 // Debug Synced Items
 /*
 chrome.storage.sync.get(null, function(changes) {
@@ -623,26 +642,13 @@ function freshSync(mode, force) {
 function syncQueue() {
 	freshSync(0, true);
 }
-if (storageapi) {
-	chrome.storage.onChanged.addListener(function(changes, namespace) {
-		if (namespace == 'sync' && localStorage['syncenable'] == 'true') {
-			if (typeof changes['lastSync'] !== 'undefined') {
-				if (changes['lastSync'].newValue != localStorage['lastSync']) {
-					importSync(changes, 1);
-					if (localStorage['syncfromnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncfromnotification.html')).show();
-				}
-			}
-		}
-	});
-	importSyncHandle(0);
-}
 function importSyncHandle(mode) {
 	if (storageapi) {
 		if (mode == '1' || (localStorage['sync'] == 'false' && mode == '0')) {
 			chrome.storage.sync.get(null, function(changes) {
 				if (typeof changes['lastSync'] !== 'undefined' && typeof changes['scriptsafe_settings'] !== 'undefined' && (typeof changes['zw0'] !== 'undefined' || typeof changes['zb0'] !== 'undefined')) {
 					if (changes['zw0'] != '' && changes['zw0'] != 'translate.googleapis.com,talkgadget.google.com,mail.google.com,youtube.com,s.ytimg.com,maps.gstatic.com') { // ensure synced whitelist is not empty and not the default
-						if (confirm("ScriptSafe has detected that you have settings synced on your Google account!\r\n\r\nClick on 'OK' if you want to import the settings from your Google Account.")) {
+						if (confirm("ScriptSafe has detected that you have settings synced on your Google account!\r\nClick on 'OK' if you want to import the settings from your Google Account.")) {
 							localStorage['syncenable'] = 'true';
 							localStorage['sync'] = 'true';
 							importSync(changes, 2);
@@ -650,20 +656,20 @@ function importSyncHandle(mode) {
 							return true;
 						} else {
 							localStorage['syncenable'] = 'false';
-							alert('Syncing has been disabled to prevent overwriting your already synced data.\r\n\r\nFeel free to go to the Options page at any time to sync your settings (make a backup of your settings if necessary).');
+							alert('Syncing has been disabled to prevent overwriting your already synced data.\r\nFeel free to go to the Options page at any time to sync your settings (make a backup of your settings if necessary).');
 							localStorage['sync'] = 'true'; // set to true so user isn't prompted with this message every time they start Chrome; localStorage['sync'] == true does not mean syncing is enabled, it's more like an acknowledgement flag
 							return false;
 						}
 					}
 				} else {
-					if (confirm("It appears you haven't synced your settings to your Google account yet.\r\n\r\nScriptSafe is about to sync your current settings to your Google account.\r\n\r\nClick on 'OK' if you want to continue.\r\n\r\nIf not, click 'Cancel', and on the other device with your preferred settings, update ScriptSafe and click on OK when you are presented with this message.")) {
+					if (confirm("It appears you haven't synced your settings to your Google account yet.\r\nScriptSafe is about to sync your current settings to your Google account.\r\nClick on 'OK' if you want to continue.\r\nIf not, click 'Cancel', and on the other device with your preferred settings, update ScriptSafe and click on OK when you are presented with this message.")) {
 						localStorage['syncenable'] = 'true';
 						localStorage['sync'] = 'true';
 						freshSync(0, true);
 						return true;
 					} else {
 						localStorage['syncenable'] = 'false';
-						alert('Syncing is disabled.\r\n\r\nFeel free to go to the Options page at any time to sync your settings (make a backup of your settings if necessary).');
+						alert('Syncing is disabled.\r\nFeel free to go to the Options page at any time to sync your settings (make a backup of your settings if necessary).');
 						localStorage['sync'] = 'true'; // set to true so user isn't prompted with this message every time they start Chrome; localStorage['sync'] == true does not mean syncing is enabled, it's more like an acknowledgement flag
 						return false;
 					}
@@ -716,7 +722,7 @@ function listsSync(mode) {
 		else localStorage['blackList'] = JSON.stringify(concatlistarr);
 	} else if (mode == '3') {
 		if (localStorage["whiteList_0"] || localStorage["blackList_0"]) {
-			if(confirm('My sincere apologies if your whitelist/blacklist appeared to be wiped out!\r\n\r\nA backup of your whitelist/blacklist was found.\r\n\r\nPlease press OK to restore your lists.\r\n\r\nIf you aren\'t ready, you can click on Cancel and start this process from the Options page by clicking on the "Try to Restore Whitelist/Blacklist" button.')) {
+			if(confirm('My sincere apologies if your whitelist/blacklist appeared to be wiped out!\r\nA backup of your whitelist/blacklist was found.\r\nPlease press OK to restore your lists.\r\nIf you aren\'t ready, you can click on Cancel and start this process from the Options page by clicking on the "Try to Restore Whitelist/Blacklist" button.')) {
 				var concatlist;
 				concatlist = '';
 				for (i = 0; i < 5; i++) {
@@ -746,7 +752,7 @@ function listsSync(mode) {
 				} else {
 					localStorage['blackList'] = concatlist;
 				}
-				alert('Successfully restored your settings!\r\n\r\nThe Options page will now open where you can review your whitelist/blacklist and choose to sync them to your Google Account (and/or sync from your Google Account)');
+				alert('Successfully restored your settings!\r\nThe Options page will now open where you can review your whitelist/blacklist and choose to sync them to your Google Account (and/or sync from your Google Account)');
 				chrome.tabs.create({url: chrome.extension.getURL('html/options.html')});
 				return true;
 			}
@@ -755,6 +761,8 @@ function listsSync(mode) {
 		}
 	}
 }
+
+//////////////////////////////////////////////////////
 if (!optionExists("version") || localStorage["version"] != version) {
 	if (optionExists("search")) delete localStorage['search']; // delete obsolete value
 	// Attempt to restore whitelist/blacklist if detected.
@@ -764,3 +772,30 @@ if (!optionExists("version") || localStorage["version"] != version) {
 		chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });
 	}
 }
+function tabClean() {
+	setInterval(function () {
+		for (var key in ITEMS) {
+			chrome.tabs.get(parseInt(key), function (tab) {
+				if (!tab) deleteTabData;
+			});
+		}
+	}, 600000); // 10 minutes
+}
+function init() {
+	setDefaultOptions();
+	tabClean();
+}
+if (storageapi) {
+	chrome.storage.onChanged.addListener(function(changes, namespace) {
+		if (namespace == 'sync' && localStorage['syncenable'] == 'true') {
+			if (typeof changes['lastSync'] !== 'undefined') {
+				if (changes['lastSync'].newValue != localStorage['lastSync']) {
+					importSync(changes, 1);
+					if (localStorage['syncfromnotify'] == 'true') webkitNotifications.createHTMLNotification(chrome.extension.getURL('html/syncfromnotification.html')).show();
+				}
+			}
+		}
+	});
+	importSyncHandle(0);
+}
+init();

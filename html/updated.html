@@ -8,16 +8,32 @@
 <body>
 	<div id="message"></div> 
 	<div id="main">
-	<h1>Updated to v<span id="versionno"></span>! (Friday, January 4, 2013)</h1>
+	<h1>Updated to v<span id="versionno"></span>! (Tuesday, July 2, 2013)</h1>
 	<div style="text-align: left; line-height: 18px; font-size: 13px;"><br />
-	<b>Happy Holidays to you and your loved ones, and may you have a prosperous year filled with happiness!</b><br /><br />
+	<b style="color: red">IMPORTANT: please read below due to recent events in the United States re: Edward Snowden and your privacy</b><br /><br />
+	It was revealed that the United States National Security Agency was/is operating a national security electronic surveillance program, with the following companies participating in the program: Microsoft, Google, Yahoo!, Facebook, Paltalk, YouTube, AOL, Skype, and Apple. To stay up to date, <a href="http://www.guardian.co.uk/world/the-nsa-files" target="_blank">The Guardian</a> has extensive coverage.<br /><br />
+	For other privacy-focused extensions to use in conjunction with ScriptSafe, check out:
+	<ul>
+		<li><a href="https://chrome.google.com/webstore/detail/https-everywhere/gcbommkclmclpchllfjekcdonpmejbdp" target="_blank">HTTPS Everywhere</a></li>
+		<li><a href="https://chrome.google.com/webstore/detail/ghostery/mlomiejdfkolichcflejclcbmpeaniij" target="_blank">Ghostery</a> (if you enable the "GhostRank" option, Ghostery will be reporting anonymous data back to Ghostery servers)</li>
+		<li><a href="https://chrome.google.com/webstore/detail/disconnect/jeoacafpbcihiomhlakheieifhpjdfeo" target="_blank">Disconnect</a></li>
+		<li><a href="https://chrome.google.com/webstore/detail/donottrackme/epanfjkfahimkgomnigadpkobaefekcd" target="_blank">DoNotTrackMe</a></li>
+		<li><a href="https://chrome.google.com/webstore/detail/empty-title/cfhdojbkjhnklbpkdaibdccddilifddb" target="_blank">Adblock Plus</a> with all of the subscription lists on the <a href="https://www.fanboy.co.nz/" target="_blank">Fanboy site</a></li>
+	</ul>
+	Browser extensions alone play a small part in protecting your privacy. To be in more control of your privacy, check out <a href="http://prism-break.org/" target="_blank">http://prism-break.org/</a> and <a href="http://fixtracking.com/" target="_blank">http://fixtracking.com/</a>.<br /><br />
+	<b>Just as a note: ScriptSafe does not have any backdoors, nor does it contact any third-party server. ScriptSafe was created by one ordinary guy (me), lovingly coded in my bedroom, without any intention other than to give you back control of the Internet.</b><br /><br /><i>You can go through the <a href="https://code.google.com/p/scriptno/source/browse/trunk" target="_blank">source code</a> and/or go through the actual instance installed on your computer by going to C:\Users\<b>**your username**</b>\AppData\Local\Google\Chrome\User Data\Default\Extensions\oiigbmnaadbkfbmpbfijlflahbdbdgdf (for non-Windows users, search for a folder named <b>oiigbmnaadbkfbmpbfijlflahbdbdgdf</b>)</i>
+	<br /><br />
 	Without further ado, here are the additions/changes to ScriptSafe in this release:
 	<ul>
-		<li><b>v1.0.6.13:</b><ul>
-			<li>tweaked syncing behaviour (disabled syncing by default) (<a href="https://code.google.com/p/scriptno/issues/detail?id=166" target="_blank">issue #166</a>)</li>
-			<li>improved popup widget to not group blocked items with blocked antisocial/unwanted matches (e.g. apis.google.com/js/plusone.js vs the "card" and "payment" APIs also under the apis.google.com domain)</li>
-			<li>fixed minor import sync notification popup bug</li>
-			<li>minor code streamlining</li>
+		<li><b>v1.0.6.14:</b><ul>
+			<li>addressed <a href="https://code.google.com/p/scriptno/issues/detail?id=80" target="_blank">high CPU/RAM usage</a> (thanks vnagarnaik!)</li>
+			<li>updated and optimized the Unwanted Content Providers blacklist, which should fix many of the false positives reported</li>
+			<li>optimized webbug blocking capabilities</li>
+			<li>fixed issue where the raw HTML code of NOSCRIPT elements were being displayed</li>
+			<li>added a tab data cleanup function to run every 10 minutes to free up unused memory</li>
+			<li>fixed <a href="https://code.google.com/p/scriptno/issues/detail?id=186" target="_blank">duplicate confirmation messages on Option page</a></li>
+			<li>minor tweak to <a href="https://code.google.com/p/scriptno/issues/detail?id=189" target="_blank">button colours in popup widget</a></li>
+			<li>minor code optimizations</li>
 		</ul></li>
 	</ul>
 	My goals for the future:
