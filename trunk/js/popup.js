@@ -228,21 +228,21 @@ var version = (function () {
 									//
 								} else {
 									if (blocked.length > 0 && undesirablecount != blocked.length) {
-										if (response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box5" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
-										else if (response.alloweditems.length > 0) $("#allowed").append('<br /><div class="box box5" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
+										if (response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box3 allowsession" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
+										else if (response.alloweditems.length > 0) $("#allowed").append('<br /><div class="box box3 allowsession" title="Allow All Blocked For Session (not including webbugs/noscript tags/annoyances)">Allow All Blocked For Session</div>');
 									} else {
 										if (response.alloweditems.length == 0) $(".thirds").append('<br />');
 										else if (response.alloweditems.length > 0) $("#allowed").append('<br />');
 									}
 								}
 							} else {
-								if (allowed.length > 0 && response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box5" title="Block All Allowed For Session">Block All Allowed For Session</div>');
-								else if (allowed.length > 0 && response.alloweditems.length > 0) $("#allowed").append('<br /><div class="box box5" title="Block All Allowed For Session">Block All Allowed For Session</div>');
+								if (allowed.length > 0 && response.alloweditems.length == 0) $(".thirds").append('<br /><div class="box box3 allowsession" title="Block All Allowed For Session">Block All Allowed For Session</div>');
+								else if (allowed.length > 0 && response.alloweditems.length > 0) $("#allowed").append('<br /><div class="box box35 allowsession" title="Block All Allowed For Session">Block All Allowed For Session</div>');
 							}
-							$(".box5").bind("click", bulkhandle);
+							$(".allowsession").bind("click", bulkhandle);
 							if (JSON.parse(response.temp).length != 0) {
-								if (blocked.length > 0 && response.alloweditems.length == 0) $(".thirds").append('<div class="box box3 prevoke" title="Revoke All Temporary Permissions">Revoke All Temporary Permissions</div>');
-								else if (blocked.length > 0 && response.alloweditems.length > 0) $("#allowed").append('<div class="box box3 prevoke" title="Revoke All Temporary Permissions">Revoke All Temporary Permissions</div>');
+								if (blocked.length > 0 && response.alloweditems.length == 0) $(".thirds").append('<div class="box box5 prevoke" title="Revoke All Temporary Permissions">Revoke All Temporary Permissions</div>');
+								else if (blocked.length > 0 && response.alloweditems.length > 0) $("#allowed").append('<div class="box box5 prevoke" title="Revoke All Temporary Permissions">Revoke All Temporary Permissions</div>');
 								$(".prevoke").bind("click", revokealltemp);
 							}
 						}

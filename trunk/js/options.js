@@ -3,8 +3,6 @@
 var syncstatus;
 document.addEventListener('DOMContentLoaded', function () {
 	loadOptions();
-	$(".domainRemover").click(function() { domainRemover($(this).attr('rel'));});
-	$(".topDomainAdd").click(function() { topDomainAdd($(this).attr('title'), $(this).attr('rel'));});
 	$(".save").click(saveOptions);
 	$("#domainsort").click(domainsort);
 	$("#whitebind").click(whitelistlisten);
@@ -404,6 +402,7 @@ function listUpdate() {
 	}
 	$('#whitelist').html(whitelistCompiled);
 	$('#blacklist').html(blacklistCompiled);
+	$(".domainRemover, .topDomainAdd").unbind('click');
 	$(".domainRemover").click(function() { domainRemover($(this).attr('rel'));});
 	$(".topDomainAdd").click(function() { topDomainAdd($(this).attr('title'), $(this).attr('rel'));});
 	updateExport();
