@@ -108,7 +108,10 @@ function mitigate(req) {
 	}
 	return { requestHeaders: req.requestHeaders };
 }
-function UrlInList(elems, url) { // credit: vnagarnaik: https://code.google.com/p/scriptno/issues/detail?id=80
+function removeParams(str) {
+	return str.replace(/#[^#]*$/, "").replace(/\?[^\?]*$/, "");
+}
+function UrlInList(url, elems) { // thanks vnagarnaik!
 	var foundElem = false;
 	for (var i = elems.length - 1; i >= 0; i--) {
 		if (elems[i].indexOf(url) > -1) {
@@ -117,9 +120,6 @@ function UrlInList(elems, url) { // credit: vnagarnaik: https://code.google.com/
 		}
 	}
 	return foundElem;
-}
-function removeParams(str) {
-	return str.replace(/#[^#]*$/, "").replace(/\?[^\?]*$/, "");
 }
 function ScriptSafe(req) {
 	if (req.tabId == -1 || req.url == 'undefined' || localStorage["enable"] == "false") {
@@ -153,21 +153,24 @@ function ScriptSafe(req) {
 		)) {
 			//console.log("BLOCKED: "+reqtype+"|"+requrl);
 			if (typeof ITEMS[req.tabId]['blocked'] === 'undefined') ITEMS[req.tabId]['blocked'] = [];
-			if (!in_array(removeParams(req.url), ITEMS[req.tabId]['blocked'])) {
+			if (!UrlInList(removeParams(req.url), ITEMS[req.tabId]['blocked'])) {
+				console.log(req.url+"|"+UrlInList(removeParams(req.url), ITEMS[req.tabId]['blocked']));
 				ITEMS[req.tabId]['blocked'].push([removeParams(req.url), reqtype.toUpperCase()]);
 				updateCount(req.tabId);
 			}
 			if (reqtype == 'frame') {
 				return { redirectUrl: 'about:blank' };
-			} else if (reqtype == 'image') {
+			} else if (reqtype == 'webbug') {
 				return { redirectUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==' };
 				// https://adblockplus.org/forum/viewtopic.php?t=7422&start=60#p50994
+			return { cancel: false };
 			}
 			return { cancel: true };
 		} else {
 			if (reqtype != 'webbug' && reqtype != 'page' && reqtype != 'xmlhttprequest') {
 				//console.log("ALLOWED: "+reqtype+"|"+requrl);
-				if (!in_array(removeParams(req.url), ITEMS[req.tabId]['allowed'])) {
+				if (typeof ITEMS[req.tabId]['allowed'] === 'undefined') ITEMS[req.tabId]['allowed'] = [];
+				if (!UrlInList(removeParams(req.url), ITEMS[req.tabId]['allowed'])) {
 					ITEMS[req.tabId]['allowed'].push([removeParams(req.url), reqtype.toUpperCase()]);
 				}
 			}
@@ -491,7 +494,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	} else if (request.reqtype == 'update-blocked') {
 		if (request.src) {
 			if (typeof ITEMS[sender.tab.id]['blocked'] === 'undefined') ITEMS[sender.tab.id]['blocked'] = [];
-			if (!in_array(removeParams(request.src), ITEMS[sender.tab.id]['blocked'])) {
+			if (!UrlInList(removeParams(request.src), ITEMS[sender.tab.id]['blocked'])) {
 				ITEMS[sender.tab.id]['blocked'].push([removeParams(request.src), request.node]);
 				updateCount(sender.tab.id);
 			}
@@ -499,8 +502,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	} else if (request.reqtype == 'update-allowed') {
 		if (request.src) {
 			if (typeof ITEMS[sender.tab.id]['allowed'] === 'undefined') ITEMS[sender.tab.id]['allowed'] = [];
-			if (!in_array(removeParams(request.src), ITEMS[sender.tab.id]['allowed'])) {
-				ITEMS[sender.tab.id]['blocked'].push([removeParams(request.src), request.node]);
+			if (!UrlInList(removeParams(request.src), ITEMS[sender.tab.id]['allowed'])) {
+				ITEMS[sender.tab.id]['allowed'].push([removeParams(request.src), request.node]);
 			}
 		}
 	} else if (request.reqtype == 'save') {
@@ -769,7 +772,8 @@ if (!optionExists("version") || localStorage["version"] != version) {
 	listsSync(3);
 	localStorage["version"] = version;
 	if (localStorage["updatenotify"] == "true") {
-		chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });
+		//chrome.tabs.create({ url: chrome.extension.getURL('html/updated.html'), selected: true });
+		// disable for now since it's a minor update
 	}
 }
 function tabClean() {
